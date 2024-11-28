@@ -5,7 +5,7 @@ import hashlib
 import os
 import json
 import logging
-from boto3.dynamodb.conditions import Attr
+from boto3.dynamodb.conditions import Key
 
 # Configure logging
 logger = logging.getLogger()
@@ -41,8 +41,9 @@ def lambda_handler(event, context):
             }
 
         # Check if the email already exists for the given tenantID
-        response = table.scan(
-            FilterExpression=Attr('tenantID').eq(tenant_id) & Attr('email').eq(email)
+        response = table.query(
+            IndexName='BusquedaPorEmail',  # El nombre del índice LSI
+            KeyConditionExpression=Key('tenantID').eq(tenant_id) & Key('email').eq(email)
         )
         if response['Items']:
             return {
@@ -62,10 +63,11 @@ def lambda_handler(event, context):
         usuario = {
             'tenantID': tenant_id,
             'userID': user_id,
-            'fechaCreacion': fecha_creacion,
             'email': email,
             'password': password_hash,
-            'nombre': data,
+            'data': data,
+            'role': "user",
+            'fechaCreacion': fecha_creacion,
             'ultimoAcceso': fecha_creacion
         }
 

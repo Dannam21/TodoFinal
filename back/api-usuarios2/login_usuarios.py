@@ -61,7 +61,8 @@ def lambda_handler(event, context):
                 'token': token,
                 'expires': fecha_hora_exp.strftime('%Y-%m-%d %H:%M:%S'),
                 'user_id': item['userID'],
-                'tenantID': tenant_id
+                'tenantID': tenant_id,
+                'role':item["role"]
             }
             tokens_table.put_item(Item=registro)
         else:

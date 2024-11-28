@@ -72,8 +72,6 @@ resources:
             AttributeType: S
           - AttributeName: userID
             AttributeType: S
-          - AttributeName: fechaCreacion
-            AttributeType: S
           - AttributeName: email
             AttributeType: S
         KeySchema:
