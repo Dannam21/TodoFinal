@@ -1,0 +1,101 @@
+org: dannamendez
+service: api-categoria
+
+provider:
+  name: aws
+  runtime: python3.12
+  memorySize: 1024
+  timeout: 30
+  iam:
+    role: arn:aws:iam::385301667309:role/LabRole
+  environment:
+    CATEGORIA_TABLE: ${sls:stage}-t_categorias
+
+functions:
+  createCategoria:
+    handler: categoria/handler_create_categoria.lambda_handler
+    events:
+      - http:
+          path: categoria/create
+          method: post
+    environment:
+      TABLE_NAME: ${self:provider.environment.CATEGORIA_TABLE}
+
+  getCategoria:
+    handler: categoria/handler_get_categoria.lambda_handler
+    events:
+      - http:
+          path: categoria/get
+          method: get
+    environment:
+      TABLE_NAME: ${self:provider.environment.CATEGORIA_TABLE}
+
+  deleteCategoria:
+    handler: categoria/handler_delete_categoria.lambda_handler
+    events:
+      - http:
+          path: categoria/delete
+          method: delete
+    environment:
+      TABLE_NAME: ${self:provider.environment.CATEGORIA_TABLE}
+
+  listCategorias:
+    handler: categoria/handler_list_categorias.lambda_handler
+    events:
+      - http:
+          path: categoria/list
+          method: get
+    environment:
+      TABLE_NAME: ${self:provider.environment.CATEGORIA_TABLE}
+
+  updateCategoria:
+    handler: categoria/handler_update_categoria.lambda_handler
+    events:
+      - http:
+          path: categoria/update
+          method: put
+    environment:
+      TABLE_NAME: ${self:provider.environment.CATEGORIA_TABLE}
+
+resources:
+  Resources:
+    CategoriasDynamoDbTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.CATEGORIA_TABLE}
+        AttributeDefinitions:
+          - AttributeName: categoriaID
+            AttributeType: S
+          - AttributeName: tenantID
+            AttributeType: S
+          - AttributeName: nombre
+            AttributeType: S
+        KeySchema:
+          - AttributeName: categoriaID
+            KeyType: HASH
+          - AttributeName: nombre
+            KeyType: RANGE  # Agregar clave de rango a la tabla principal
+        LocalSecondaryIndexes:
+          - IndexName: LSI_Nombre
+            KeySchema:
+              - AttributeName: categoriaID
+                KeyType: HASH
+              - AttributeName: nombre
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+        GlobalSecondaryIndexes:
+          - IndexName: GSI_TenantID
+            KeySchema:
+              - AttributeName: tenantID
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 5
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5
+        PointInTimeRecoverySpecification:
+          PointInTimeRecoveryEnabled: true

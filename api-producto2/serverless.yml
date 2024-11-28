@@ -1,0 +1,101 @@
+org: dannamendez
+service: api-producto
+
+provider:
+  name: aws
+  runtime: python3.12
+  memorySize: 1024
+  timeout: 30
+  iam:
+    role: arn:aws:iam::385301667309:role/LabRole
+  environment:
+    PRODUCTO_TABLE: ${sls:stage}-t_productos
+
+functions:
+  createProducto:
+    handler: producto/handler_create_producto.lambda_handler
+    events:
+      - http:
+          path: producto/create
+          method: post
+    environment:
+      TABLE_NAME: ${self:provider.environment.PRODUCTO_TABLE}
+
+  getProducto:
+    handler: producto/handler_get_producto.lambda_handler
+    events:
+      - http:
+          path: producto/get
+          method: get
+    environment:
+      TABLE_NAME: ${self:provider.environment.PRODUCTO_TABLE}
+
+  deleteProducto:
+    handler: producto/handler_delete_producto.lambda_handler
+    events:
+      - http:
+          path: producto/delete
+          method: delete
+    environment:
+      TABLE_NAME: ${self:provider.environment.PRODUCTO_TABLE}
+
+  listProductos:
+    handler: producto/handler_list_productos.lambda_handler
+    events:
+      - http:
+          path: producto/list
+          method: get
+    environment:
+      TABLE_NAME: ${self:provider.environment.PRODUCTO_TABLE}
+
+  updateProducto:
+    handler: producto/handler_update_producto.lambda_handler
+    events:
+      - http:
+          path: producto/update
+          method: patch
+    environment:
+      TABLE_NAME: ${self:provider.environment.PRODUCTO_TABLE}
+
+resources:
+  Resources:
+    ProductosDynamoDbTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.PRODUCTO_TABLE}
+        AttributeDefinitions:
+          - AttributeName: productoID
+            AttributeType: S
+          - AttributeName: tenantID
+            AttributeType: S
+          - AttributeName: stock
+            AttributeType: N
+        KeySchema:
+          - AttributeName: productoID
+            KeyType: HASH
+          - AttributeName: stock
+            KeyType: RANGE
+        LocalSecondaryIndexes:
+          - IndexName: LSI_Stock
+            KeySchema:
+              - AttributeName: productoID
+                KeyType: HASH
+              - AttributeName: stock
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+        GlobalSecondaryIndexes:
+          - IndexName: GSI_TenantID
+            KeySchema:
+              - AttributeName: tenantID
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 5
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5
+        PointInTimeRecoverySpecification:
+          PointInTimeRecoveryEnabled: true

@@ -1,0 +1,108 @@
+org: dannamendez
+service: api-tienda
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  memorySize: 1024
+  timeout: 30
+  iam:
+    role: arn:aws:iam::385301667309:role/LabRole  # ARN del rol LabRole
+  environment:
+    PRODUCTS_TABLE: ${sls:stage}-productos
+    USERS_TABLE: ${sls:stage}-usuarios
+
+functions:
+  createProduct:
+    handler: create_product.handler
+    events:
+      - http:
+          path: /productos/create
+          method: post
+          cors: true
+          integration: lambda
+
+  fetchProduct:
+    handler: fetch_product.handler
+    events:
+      - http:
+          path: /productos/fetch
+          method: get
+          cors: true
+          integration: lambda
+
+  createUser:
+    handler: create_user.handler
+    events:
+      - http:
+          path: /usuarios/create
+          method: post
+          cors: true
+          integration: lambda
+
+  fetchUser:
+    handler: fetch_user.handler
+    events:
+      - http:
+          path: /usuarios/fetch
+          method: get
+          cors: true
+          integration: lambda
+
+resources:
+  Resources:
+    ProductosTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.PRODUCTS_TABLE}
+        AttributeDefinitions:
+          - AttributeName: tenantID
+            AttributeType: S
+          - AttributeName: productoID
+            AttributeType: S
+          - AttributeName: nombre
+            AttributeType: S # Atributo faltante agregado
+        KeySchema:
+          - AttributeName: tenantID
+            KeyType: HASH
+          - AttributeName: productoID
+            KeyType: RANGE
+        BillingMode: PAY_PER_REQUEST
+        PointInTimeRecoverySpecification:
+          PointInTimeRecoveryEnabled: true
+        LocalSecondaryIndexes:
+          - IndexName: ProductoIndex
+            KeySchema:
+              - AttributeName: tenantID
+                KeyType: HASH
+              - AttributeName: nombre
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+        GlobalSecondaryIndexes:
+          - IndexName: UsuarioIndex
+            KeySchema:
+              - AttributeName: tenantID
+                KeyType: HASH
+              - AttributeName: productoID
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+
+    UsuariosTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.USERS_TABLE}
+        AttributeDefinitions:
+          - AttributeName: tenantID
+            AttributeType: S
+          - AttributeName: email
+            AttributeType: S
+        KeySchema:
+          - AttributeName: tenantID
+            KeyType: HASH
+          - AttributeName: email
+            KeyType: RANGE
+        BillingMode: PAY_PER_REQUEST
+        PointInTimeRecoverySpecification:
+          PointInTimeRecoveryEnabled: true
