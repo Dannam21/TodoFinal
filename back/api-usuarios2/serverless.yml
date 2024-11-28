@@ -74,7 +74,7 @@ resources:
             AttributeType: S
           - AttributeName: fechaCreacion
             AttributeType: S
-          - AttributeName: ultimoAcceso
+          - AttributeName: email
             AttributeType: S
         KeySchema:
           - AttributeName: tenantID
@@ -84,24 +84,12 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 5
           WriteCapacityUnits: 5
-        GlobalSecondaryIndexes:
-          - IndexName: FechaCreacionIndex
-            KeySchema:
-              - AttributeName: tenantID
-                KeyType: HASH
-              - AttributeName: fechaCreacion
-                KeyType: RANGE
-            Projection:
-              ProjectionType: ALL
-            ProvisionedThroughput:
-              ReadCapacityUnits: 5
-              WriteCapacityUnits: 5
         LocalSecondaryIndexes:
-          - IndexName: UltimoAccesoIndex
+          - IndexName: BusquedaPorEmail
             KeySchema:
               - AttributeName: tenantID
                 KeyType: HASH
-              - AttributeName: ultimoAcceso
+              - AttributeName: email
                 KeyType: RANGE
             Projection:
               ProjectionType: ALL

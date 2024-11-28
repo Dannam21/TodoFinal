@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 import json
 import os
 import logging
-from boto3.dynamodb.conditions import Attr
+from boto3.dynamodb.conditions import Key
 
 # Configure logging
 logger = logging.getLogger()
@@ -40,8 +40,9 @@ def lambda_handler(event, context):
         users_table = dynamodb.Table(os.environ['USERS_TABLE'])
         tokens_table = dynamodb.Table('t_tokens_acceso')
 
-        response = users_table.scan(
-            FilterExpression=Attr('tenantID').eq(tenant_id) & Attr('email').eq(email)
+        response = users_table.query(
+            IndexName='BusquedaPorEmail',  # El nombre del índice LSI
+            KeyConditionExpression=Key('tenantID').eq(tenant_id) & Key('email').eq(email)
         )
         items = response.get('Items', [])
 
