@@ -53,7 +53,7 @@ def lambda_handler(event, context):
             }
 
         item = items[0]
-        if hashed_password == item['passwordHash']:
+        if hashed_password == item['password']:
             # Generate token
             token = str(uuid.uuid4())
             fecha_hora_exp = datetime.utcnow() + timedelta(minutes=60)
