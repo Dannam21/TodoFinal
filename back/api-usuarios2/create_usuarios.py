@@ -30,11 +30,11 @@ def lambda_handler(event, context):
         body = json.loads(event['body'])
         tenant_id = body.get('tenantID')
         email = body.get('email')
-        nombre = body.get('nombre')
         password = body.get('password')
+        data = body.get('data')
 
         # Validate required fields
-        if not tenant_id or not email or not nombre or not password:
+        if not tenant_id or not email or not data or not password:
             return {
                 'statusCode': 400,
                 'body': json.dumps({'error': 'Missing tenantID, email, nombre, or password'})
@@ -63,9 +63,9 @@ def lambda_handler(event, context):
             'tenantID': tenant_id,
             'userID': user_id,
             'fechaCreacion': fecha_creacion,
-            'nombre': nombre,
             'email': email,
-            'passwordHash': password_hash,
+            'password': password_hash,
+            'nombre': data,
             'ultimoAcceso': fecha_creacion
         }
 
