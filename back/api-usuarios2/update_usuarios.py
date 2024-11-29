@@ -30,9 +30,12 @@ def lambda_handler(event, context):
         })
 
 
-        invoke_response = lambda_client.invoke(FunctionName="validar_token_acceso",
-                                            InvocationType='RequestResponse',
-                                            Payload = payload_string)
+        invoke_response = lambda_client.invoke(
+            FunctionName="validar_token_acceso",
+            InvocationType='RequestResponse',
+            Payload=payload_string
+        )
+        
         response1 = json.loads(invoke_response['Payload'].read())
         if response1['statusCode'] == 403:
             return {
