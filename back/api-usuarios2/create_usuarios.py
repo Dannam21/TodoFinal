@@ -28,7 +28,7 @@ def lambda_handler(event, context):
 
         # Parse the event body
         body = json.loads(event['body'])
-        tenant_id = body.get('tenantID')
+        tenant_id = body.get('tenant_id')
         email = body.get('email')
         password = body.get('password')
         data = body.get('data')
@@ -43,7 +43,7 @@ def lambda_handler(event, context):
         # Check if the email already exists for the given tenantID
         response = table.query(
             IndexName='BusquedaPorEmail',  # El nombre del índice LSI
-            KeyConditionExpression=Key('tenantID').eq(tenant_id) & Key('email').eq(email)
+            KeyConditionExpression=Key('tenant_id').eq(tenant_id) & Key('email').eq(email)
         )
         if response['Items']:
             return {
@@ -61,8 +61,8 @@ def lambda_handler(event, context):
 
         # Create user item
         usuario = {
-            'tenantID': tenant_id,
-            'userID': user_id,
+            'tenant_id': tenant_id,
+            'user_id': user_id,
             'email': email,
             'password': password_hash,
             'data': data,
@@ -81,7 +81,7 @@ def lambda_handler(event, context):
             'token': token,
             'expires': fecha_hora_exp.strftime('%Y-%m-%d %H:%M:%S'),
             'user_id': user_id,
-            'tenantID': tenant_id,
+            'tenant_id': tenant_id,
             'role':usuario["role"]
         }
         tokens_table.put_item(Item=registro)
@@ -91,8 +91,8 @@ def lambda_handler(event, context):
             'statusCode': 201,
             'body': json.dumps({
                 'message': 'Usuario creado',
-                'tenantID': tenant_id,
-                'userID': user_id,
+                'tenant_id': tenant_id,
+                'user_id': user_id,
                 'fechaCreacion': fecha_creacion,
                 'token': token
             })

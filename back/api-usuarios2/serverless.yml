@@ -68,16 +68,16 @@ resources:
       Properties:
         TableName: ${self:provider.environment.USERS_TABLE}
         AttributeDefinitions:
-          - AttributeName: tenantID
+          - AttributeName: tenant_id
             AttributeType: S
-          - AttributeName: userID
+          - AttributeName: user_id
             AttributeType: S
           - AttributeName: email
             AttributeType: S
         KeySchema:
-          - AttributeName: tenantID
+          - AttributeName: tenant_id
             KeyType: HASH
-          - AttributeName: userID
+          - AttributeName: user_id
             KeyType: RANGE
         ProvisionedThroughput:
           ReadCapacityUnits: 5
@@ -85,7 +85,7 @@ resources:
         LocalSecondaryIndexes:
           - IndexName: BusquedaPorEmail
             KeySchema:
-              - AttributeName: tenantID
+              - AttributeName: tenant_id
                 KeyType: HASH
               - AttributeName: email
                 KeyType: RANGE

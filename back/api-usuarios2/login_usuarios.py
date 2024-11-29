@@ -22,7 +22,7 @@ def lambda_handler(event, context):
 
         # Parse the event body
         body = json.loads(event['body'])
-        tenant_id = body.get('tenantID')
+        tenant_id = body.get('tenant_id')
         email = body.get('email')
         password = body.get('password')
 
@@ -30,7 +30,7 @@ def lambda_handler(event, context):
         if not tenant_id or not email or not password:
             return {
                 'statusCode': 400,
-                'body': json.dumps({'error': 'Missing tenantID, email, or password'})
+                'body': json.dumps({'error': 'Missing tenant_id, email, or password'})
             }
 
         hashed_password = hash_password(password)
@@ -42,7 +42,7 @@ def lambda_handler(event, context):
 
         response = users_table.query(
             IndexName='BusquedaPorEmail',  # El nombre del índice LSI
-            KeyConditionExpression=Key('tenantID').eq(tenant_id) & Key('email').eq(email)
+            KeyConditionExpression=Key('tenant_id').eq(tenant_id) & Key('email').eq(email)
         )
         items = response.get('Items', [])
 
@@ -61,7 +61,7 @@ def lambda_handler(event, context):
                 'token': token,
                 'expires': fecha_hora_exp.strftime('%Y-%m-%d %H:%M:%S'),
                 'user_id': item['userID'],
-                'tenantID': tenant_id,
+                'tenant_id': tenant_id,
                 'role':item["role"]
             }
             tokens_table.put_item(Item=registro)
