@@ -22,7 +22,14 @@ def lambda_handler(event, context):
 
         token = event['headers']['Authorization']
         lambda_client = boto3.client('lambda')    
-        payload_string = '{ "token": "' + token +','+ '"tenant_id": "' + tenant_id + ','+ '"user_id": "' + user_id+'" }'
+
+        payload_string = json.dumps({
+            "token": token,
+            "tenant_id": tenant_id,
+            "user_id": user_id
+        })
+
+
         invoke_response = lambda_client.invoke(FunctionName="validar_token_acceso",
                                             InvocationType='RequestResponse',
                                             Payload = payload_string)
