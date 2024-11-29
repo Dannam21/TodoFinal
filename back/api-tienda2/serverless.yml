@@ -31,23 +31,6 @@ functions:
           cors: true
           integration: lambda
 
-  createUser:
-    handler: create_user.handler
-    events:
-      - http:
-          path: /usuarios/create
-          method: post
-          cors: true
-          integration: lambda
-
-  fetchUser:
-    handler: fetch_user.handler
-    events:
-      - http:
-          path: /usuarios/fetch
-          method: get
-          cors: true
-          integration: lambda
 
 resources:
   Resources:
