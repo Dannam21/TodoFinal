@@ -59,7 +59,7 @@ def lambda_handler(event, context):
             IndexName='BusquedaPorEmail',  # El nombre del índice LSI
             KeyConditionExpression=Key('tenant_id').eq(tenant_id) & Key('email').eq(email)
         )
-        print(response)
+        print(response.get('Items'))
         if response.get('Items'):
             user_item = response['Items'][0]
             payload = {
