@@ -39,6 +39,14 @@ def lambda_handler(event, context):
 
             # Leer la respuesta de la función de validación
             response1 = json.loads(invoke_response['Payload'].read().decode())
+            
+            # Imprimir la respuesta para depuración
+            print(f"Response from ValidarTokenAcceso: {response1}")
+
+            # Verificar si la respuesta tiene el statusCode
+            if 'statusCode' not in response1:
+                raise Exception("Invalid response structure: 'statusCode' not found")
+
             if response1['statusCode'] == 403:
                 return {
                     'statusCode': 403,
@@ -69,6 +77,12 @@ def lambda_handler(event, context):
                 )
 
                 response1 = json.loads(invoke_response['Payload'].read().decode())
+                print(f"Response from ValidarTokenAcceso: {response1}")
+                
+                # Verificar si la respuesta tiene el statusCode
+                if 'statusCode' not in response1:
+                    raise Exception("Invalid response structure: 'statusCode' not found")
+
                 if response1['statusCode'] == 403:
                     return {
                         'statusCode': 403,
@@ -92,19 +106,14 @@ def lambda_handler(event, context):
         )
 
         # Verificar si la eliminación fue exitosa
-        if response.get('Deleted', False):
-            return {
-                'statusCode': 204,
-                'body': json.dumps({'message': 'Usuario eliminado exitosamente'})
-            }
-        else:
-            return {
-                'statusCode': 500,
-                'body': json.dumps({'error': 'No se pudo eliminar el usuario'})
-            }
+        return {
+            'statusCode': 204,
+            'body': json.dumps({'message': 'Usuario eliminado exitosamente'})
+        }
 
     except Exception as e:
         # Manejo de errores
+        print(f"Error: {str(e)}")  # Agregar impresión para diagnóstico
         return {
             'statusCode': 500,
             'body': json.dumps({'error': str(e)})
