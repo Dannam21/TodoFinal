@@ -11,7 +11,7 @@ table = dynamodb.Table(USERS_TABLE)
 def lambda_handler(event, context):
     try:
         # Parsear el cuerpo de la solicitud
-        body = event.get('body', {})
+        body = json.loads(event['body'])
         tenant_id = body.get('tenant_id')
         user_id = body.get('user_id')
         email = body.get('email')
