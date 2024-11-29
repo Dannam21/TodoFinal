@@ -60,7 +60,7 @@ def lambda_handler(event, context):
             registro = {
                 'token': token,
                 'expires': fecha_hora_exp.strftime('%Y-%m-%d %H:%M:%S'),
-                'user_id': item['userID'],
+                'user_id': item['user_id'],
                 'tenant_id': tenant_id,
                 'role':item["role"]
             }
