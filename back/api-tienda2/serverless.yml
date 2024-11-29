@@ -9,7 +9,7 @@ provider:
   iam:
     role: arn:aws:iam::385301667309:role/LabRole  # ARN del rol LabRole
   environment:
-    PRODUCTS_TABLE: ${sls:stage}-productos
+    PRODUCTS_TABLE: ${sls:stage}-tienda
     USERS_TABLE: ${sls:stage}-usuarios
 
 functions:
@@ -34,58 +34,16 @@ functions:
 
 resources:
   Resources:
-    ProductosTable:
+    TiendaTable:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: ${self:provider.environment.PRODUCTS_TABLE}
+        TableName: ${self:provider.environment.TIENDA_TABLE}
         AttributeDefinitions:
           - AttributeName: tenant_id
-            AttributeType: S
-          - AttributeName: productoID
-            AttributeType: S
-          - AttributeName: nombre
-            AttributeType: S 
-        KeySchema:
-          - AttributeName: tenant_id
-            KeyType: HASH
-          - AttributeName: productoID
-            KeyType: RANGE
-        BillingMode: PAY_PER_REQUEST
-        PointInTimeRecoverySpecification:
-          PointInTimeRecoveryEnabled: true
-        LocalSecondaryIndexes:
-          - IndexName: ProductoIndex
-            KeySchema:
-              - AttributeName: tenant_id
-                KeyType: HASH
-              - AttributeName: nombre
-                KeyType: RANGE
-            Projection:
-              ProjectionType: ALL
-        GlobalSecondaryIndexes:
-          - IndexName: UsuarioIndex
-            KeySchema:
-              - AttributeName: tenant_id
-                KeyType: HASH
-              - AttributeName: productoID
-                KeyType: RANGE
-            Projection:
-              ProjectionType: ALL
-
-    UsuariosTable:
-      Type: AWS::DynamoDB::Table
-      Properties:
-        TableName: ${self:provider.environment.USERS_TABLE}
-        AttributeDefinitions:
-          - AttributeName: tenant_id
-            AttributeType: S
-          - AttributeName: email
             AttributeType: S
         KeySchema:
           - AttributeName: tenant_id
             KeyType: HASH
-          - AttributeName: email
-            KeyType: RANGE
         BillingMode: PAY_PER_REQUEST
         PointInTimeRecoverySpecification:
           PointInTimeRecoveryEnabled: true
