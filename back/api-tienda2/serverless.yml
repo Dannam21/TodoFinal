@@ -12,7 +12,7 @@ provider:
     TIENDA_TABLE: ${sls:stage}-tienda
 
 functions:
-  createTienda:
+  createProduct:
     handler: create_tienda.handler
     events:
       - http:
@@ -21,7 +21,7 @@ functions:
           cors: true
           integration: lambda
 
-  fetchTienda:
+  fetchProduct:
     handler: fetch_tienda.handler
     events:
       - http:
@@ -30,10 +30,9 @@ functions:
           cors: true
           integration: lambda
 
-
 resources:
   Resources:
-    TiendaTable:
+    ProductosTable:
       Type: AWS::DynamoDB::Table
       Properties:
         TableName: ${self:provider.environment.TIENDA_TABLE}
@@ -46,3 +45,4 @@ resources:
         BillingMode: PAY_PER_REQUEST
         PointInTimeRecoverySpecification:
           PointInTimeRecoveryEnabled: true
+        
