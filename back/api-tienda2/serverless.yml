@@ -14,7 +14,7 @@ provider:
 
 functions:
   createTienda:
-    handler: create_product.handler
+    handler: create_tienda.handler
     events:
       - http:
           path: /tienda/create
@@ -23,7 +23,7 @@ functions:
           integration: lambda
 
   fetchTienda:
-    handler: fetch_product.handler
+    handler: fetch_tienda.handler
     events:
       - http:
           path: /tienda/fetch
