@@ -11,6 +11,7 @@ def lambda_handler(event, context):
     tenant_id = event.get('queryStringParameters', {}).get('tenant_id')
     user_id = event.get('queryStringParameters', {}).get('user_id')
     email = event.get('queryStringParameters', {}).get('email')
+    print(event)
 
     token = event['headers']['Authorization']
     lambda_client = boto3.client('lambda')    
