@@ -54,8 +54,8 @@ functions:
           path: usuarios/update
           method: put
 
-  validarTokenAcceso:
-    handler: validar_token_acceso.lambda_handler
+  ValidarTokenAcceso:
+    handler: ValidarTokenAcceso.lambda_handler
     events:
       - http:
           path: usuarios/validar-token
