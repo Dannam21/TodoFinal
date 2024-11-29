@@ -2,12 +2,12 @@ const AWS = require("aws-sdk");
 const dynamoDB = new AWS.DynamoDB.DocumentClient();
 
 exports.handler = async (event) => {
-    const { tenantID, email } = event.queryStringParameters || {};
+    const { tenant_id, email } = event.queryStringParameters || {};
     const params = {
         TableName: "Usuarios",
-        KeyConditionExpression: "tenantID = :tenantID AND email = :email",
+        KeyConditionExpression: "tenant_id = :tenant_id AND email = :email",
         ExpressionAttributeValues: {
-            ":tenantID": tenantID,
+            ":tenant_id": tenant_id,
             ":email": email,
         },
     };

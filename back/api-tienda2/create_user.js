@@ -2,11 +2,11 @@ const AWS = require("aws-sdk");
 const dynamoDB = new AWS.DynamoDB.DocumentClient();
 
 exports.handler = async (event) => {
-    const { tenantID, email, nombre, passwordHash } = JSON.parse(event.body);
+    const { tenant_id, email, nombre, passwordHash } = JSON.parse(event.body);
     const params = {
         TableName: "Usuarios",
         Item: {
-            tenantID,
+            tenant_id,
             email,
             nombre,
             passwordHash,

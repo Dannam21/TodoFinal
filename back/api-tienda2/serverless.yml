@@ -56,14 +56,14 @@ resources:
       Properties:
         TableName: ${self:provider.environment.PRODUCTS_TABLE}
         AttributeDefinitions:
-          - AttributeName: tenantID
+          - AttributeName: tenant_id
             AttributeType: S
           - AttributeName: productoID
             AttributeType: S
           - AttributeName: nombre
             AttributeType: S  # Añadido para ProductoIndex
         KeySchema:
-          - AttributeName: tenantID
+          - AttributeName: tenant_id
             KeyType: HASH
           - AttributeName: productoID
             KeyType: RANGE
@@ -73,7 +73,7 @@ resources:
         LocalSecondaryIndexes:
           - IndexName: ProductoIndex
             KeySchema:
-              - AttributeName: tenantID
+              - AttributeName: tenant_id
                 KeyType: HASH
               - AttributeName: nombre
                 KeyType: RANGE
@@ -82,7 +82,7 @@ resources:
         GlobalSecondaryIndexes:
           - IndexName: UsuarioIndex
             KeySchema:
-              - AttributeName: tenantID
+              - AttributeName: tenant_id
                 KeyType: HASH
               - AttributeName: productoID
                 KeyType: RANGE
@@ -94,12 +94,12 @@ resources:
       Properties:
         TableName: ${self:provider.environment.USERS_TABLE}
         AttributeDefinitions:
-          - AttributeName: tenantID
+          - AttributeName: tenant_id
             AttributeType: S
           - AttributeName: email
             AttributeType: S
         KeySchema:
-          - AttributeName: tenantID
+          - AttributeName: tenant_id
             KeyType: HASH
           - AttributeName: email
             KeyType: RANGE
