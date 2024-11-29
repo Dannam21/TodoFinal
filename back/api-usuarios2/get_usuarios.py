@@ -25,9 +25,9 @@ def lambda_handler(event, context):
     if tenant_id and user_id:
         ##
         payload_string = '{ "token": "' + token +','+ '"tenant_id": "' + tenant_id + ','+ '"user_id": "' + user_id+'" }'
-        invoke_response = lambda_client.invoke(FunctionName="validar_token_acceso",
-                                            InvocationType='RequestResponse',
-                                            Payload = payload_string)
+        invoke_response = lambda_client.invoke(FunctionName="ValidarTokenAcceso",
+                                           InvocationType='RequestResponse',
+                                           Payload = payload_string)
         response1 = json.loads(invoke_response['Payload'].read())
         if response1['statusCode'] == 403:
             return {
