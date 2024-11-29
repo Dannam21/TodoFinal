@@ -7,7 +7,7 @@ provider:
   memorySize: 1024
   timeout: 30
   iam:
-    role: arn:aws:iam::385301667309:role/LabRole
+    role: arn:aws:iam::385301667309:role/LabRole  # Asegúrate de que el rol tenga permisos lambda:InvokeFunction
   environment:
     USERS_TABLE: ${sls:stage}-usuarios
 
