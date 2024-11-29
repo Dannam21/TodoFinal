@@ -42,7 +42,7 @@ def lambda_handler(event, context):
             KeyConditionExpression=Key('tenant_id').eq(tenant_id) & Key('email').eq(email)
         )
         payload_string = '{ "token": "' + token +','+ '"tenant_id": "' + response['tenant_id'] + ','+ '"user_id": "' + response['user_id']+'" }'
-        invoke_response = lambda_client.invoke(FunctionName="validar_token_acceso",
+        invoke_response = lambda_client.invoke(FunctionName="validarTokenAcceso",
                                             InvocationType='RequestResponse',
                                             Payload = payload_string)
         response1 = json.loads(invoke_response['Payload'].read())
