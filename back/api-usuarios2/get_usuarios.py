@@ -26,6 +26,7 @@ def lambda_handler(event, context):
 
     # Crear el cliente de Lambda para invocar la función de validación del token
     lambda_client = boto3.client('lambda')
+    item = None
 
     # Verificar si tenemos tenant_id y user_id
     if tenant_id and user_id:
@@ -52,6 +53,7 @@ def lambda_handler(event, context):
 
         # Consultar el usuario en DynamoDB
         response = table.get_item(Key={'tenant_id': tenant_id, 'user_id': user_id})
+        item = response.get('Item') if 'Item' in response else None
 
     # Si tenemos tenant_id y email, usamos otro índice en DynamoDB
     elif tenant_id and email:
@@ -97,8 +99,6 @@ def lambda_handler(event, context):
         }
 
     # Obtener el ítem de la respuesta de DynamoDB
-    item = response.get('Item') if 'Item' in response else None
-
     if not item:
         return {
             'statusCode': 404,
