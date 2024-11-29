@@ -10,9 +10,9 @@ def lambda_handler(event, context):
     try:
         body = json.loads(event['body'])
         tenant_id = body['tenantID']
-        user_id = body['userID']
+        user_id = body['user_id']
 
-        response = table.delete_item(Key={'tenantID': tenant_id, 'userID': user_id})
+        response = table.delete_item(Key={'tenantID': tenant_id, 'user_id': user_id})
 
         return {
             'statusCode': 204,
