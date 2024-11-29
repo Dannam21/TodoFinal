@@ -9,63 +9,39 @@ table = dynamodb.Table(USERS_TABLE)
 
 def lambda_handler(event, context):
     try:
-        # Parsear el cuerpo de la solicitud
         body = json.loads(event['body'])
 
-        tenant_id = body['tenant_id']  # obligatorio
-        user_id = body['user_id']  # obligatorio
+        tenant_id = body['tenant_id']#obligatorio
+        user_id = body['user_id']#obligatorio
 
         email = body.get('email')
         data = body.get('data')
 
-        # Inicializar la expresión de actualización
         update_expression = "set "
         expression_attribute_values = {}
 
-        # Obtener el token del encabezado Authorization
-        token = event['headers'].get('Authorization')
-        if not token:
+        token = event['headers']['Authorization']
+        lambda_client = boto3.client('lambda')    
+        payload_string = '{ "token": "' + token +','+ '"tenant_id": "' + tenant_id + ','+ '"user_id": "' + user_id+'" }'
+        invoke_response = lambda_client.invoke(FunctionName="validar_token_acceso",
+                                            InvocationType='RequestResponse',
+                                            Payload = payload_string)
+        response1 = json.loads(invoke_response['Payload'].read())
+        if response1['statusCode'] == 403:
             return {
-                'statusCode': 400,
-                'body': json.dumps({'error': 'Authorization header is missing'})
+                'statusCode' : 403,
+                'status' : 'Forbidden - Acceso No Autorizado'
             }
 
-        # Aquí construimos el diccionario con los parámetros necesarios
-        payload_dict = {
-            "token": token,  # El valor del token que debería llegar como 'Bearer <token>'
-            "tenant_id": tenant_id,
-            "user_id": user_id
-        }
-
-        # Convertir el diccionario a una cadena JSON válida
-        payload_string = json.dumps(payload_dict)
-
-        # Invocar la función Lambda para validar el token
-        lambda_client = boto3.client('lambda')
-        invoke_response = lambda_client.invoke(
-            FunctionName="validar_token_acceso",
-            InvocationType='RequestResponse',
-            Payload=payload_string
-        )
-
-        # Procesar la respuesta de la función Lambda
-        response1 = json.loads(invoke_response['Payload'].read().decode())
-        if response1.get('statusCode') == 403:
-            return {
-                'statusCode': 403,
-                'body': json.dumps({'status': 'Forbidden - Acceso No Autorizado'})
-            }
-
-        # Si hay datos para actualizar, agregarlos a la expresión de actualización
         if data:
             update_expression += "data = :data, "
             expression_attribute_values[':data'] = data
 
-        # Si se proporciona un email, verificar si ya existe en el sistema
         if email:
+            ##
             response = table.query(
-                IndexName='BusquedaPorEmail',  # El nombre del índice LSI
-                KeyConditionExpression=Key('tenant_id').eq(tenant_id) & Key('email').eq(email)
+            IndexName='BusquedaPorEmail',  # El nombre del índice LSI
+            KeyConditionExpression=Key('tenant_id').eq(tenant_id) & Key('email').eq(email)
             )
             if response['Items']:
                 return {
@@ -73,13 +49,13 @@ def lambda_handler(event, context):
                     'body': json.dumps({'error': 'Email already exists for this tenant'})
                 }
 
+            ##
             update_expression += "email = :email, "
             expression_attribute_values[':email'] = email
 
-        # Eliminar la última coma de la expresión de actualización
+
         update_expression = update_expression.rstrip(', ')
 
-        # Actualizar el item en la tabla DynamoDB
         response = table.update_item(
             Key={'tenant_id': tenant_id, 'user_id': user_id},
             UpdateExpression=update_expression,
