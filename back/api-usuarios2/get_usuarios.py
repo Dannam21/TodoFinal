@@ -13,7 +13,7 @@ def lambda_handler(event, context):
     tenant_id = params.get('tenant_id')
     user_id = params.get('user_id')
     email = params.get('email')
-    print(params)
+    print(email)
 
     # Obtener el token de autorización
     token = event['headers'].get('Authorization')
