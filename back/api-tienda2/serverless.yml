@@ -9,7 +9,7 @@ provider:
   iam:
     role: arn:aws:iam::385301667309:role/LabRole  # ARN del rol LabRole
   environment:
-    TIENDA_TABLE: ${self:provider.environment.TIENDA_TABLE}  # Usando el nombre de tabla a través de variable de entorno
+    TIENDA_TABLE: ${self:service}-${sls:stage}-tienda  # Usamos la variable `${self:service}` para obtener el nombre del servicio y `${sls:stage}` para el entorno
 
 functions:
   createProduct:
@@ -35,7 +35,7 @@ resources:
     TiendaTable:  # Nombre del recurso de la tabla DynamoDB
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: ${self:provider.environment.TIENDA_TABLE}  # Usando el nombre de la tabla de entorno
+        TableName: ${self:service}-${sls:stage}-tienda  # El nombre de la tabla se genera de manera similar
         AttributeDefinitions:
           - AttributeName: tenant_id
             AttributeType: S

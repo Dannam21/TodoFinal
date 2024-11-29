@@ -13,7 +13,7 @@ exports.handler = async (event) => {
     const { tenant_id, datos } = body;
 
     const params = {
-        TableName: process.env.TIENDA_TABLE,  // Use environment variable
+        TableName: process.env.TIENDA_TABLE,  // Use environment variable for the table name
         Item: {
             tenant_id,
             datos,
