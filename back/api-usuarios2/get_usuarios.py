@@ -76,6 +76,7 @@ def lambda_handler(event, context):
             )
 
             response1 = json.loads(invoke_response['Payload'].read().decode())
+            print(response1)
             if response1['statusCode'] == 403:
                 return {
                     'statusCode': 403,
