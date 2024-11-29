@@ -1,20 +1,25 @@
 import boto3
 import os
 import json
+from boto3.dynamodb.conditions import Key
 
+# Configuración de DynamoDB
 dynamodb = boto3.resource('dynamodb')
 USERS_TABLE = os.environ['USERS_TABLE']
 table = dynamodb.Table(USERS_TABLE)
 
 def lambda_handler(event, context):
     try:
-        body = json.loads(event['body'])
+        # Parsear el cuerpo de la solicitud
+        body = event.get('body', {})
         tenant_id = body.get('tenant_id')
         user_id = body.get('user_id')
         email = body.get('email')
         
+        # Obtener el token de autorización de los encabezados
         token = event['headers'].get('Authorization')
 
+        # Crear el cliente de Lambda para invocar la función de validación del token
         lambda_client = boto3.client('lambda')
 
         # Verificar si tenemos tenant_id y user_id
@@ -40,14 +45,14 @@ def lambda_handler(event, context):
                     'body': json.dumps({'error': 'Forbidden - Acceso No Autorizado'})
                 }
 
-
         # Si tenemos tenant_id y email, usamos otro índice en DynamoDB
         elif tenant_id and email:
             response = table.query(
                 IndexName='BusquedaPorEmail',  # El nombre del índice LSI
                 KeyConditionExpression=Key('tenant_id').eq(tenant_id) & Key('email').eq(email)
             )
-        
+
+            # Verificar si encontramos el usuario por email
             if len(response.get('Items', [])) > 0:
                 user_item = response['Items'][0]
                 payload = {
@@ -64,7 +69,6 @@ def lambda_handler(event, context):
                 )
 
                 response1 = json.loads(invoke_response['Payload'].read().decode())
-                print(response1)
                 if response1['statusCode'] == 403:
                     return {
                         'statusCode': 403,
@@ -75,19 +79,32 @@ def lambda_handler(event, context):
                     'statusCode': 404,
                     'body': json.dumps({'error': 'Usuario no encontrado'})
                 }
+
         else:
             return {
                 'statusCode': 400,
                 'body': json.dumps({'error': 'Debe proporcionar tenant_id y user_id o tenant_id y email'})
             }
 
-        response = table.delete_item(Key={'tenant_id': tenant_id, 'user_id': user_id})
+        # Si el usuario ha sido validado y se encuentra, proceder a eliminarlo
+        response = table.delete_item(
+            Key={'tenant_id': tenant_id, 'user_id': user_id}
+        )
 
-        return {
-            'statusCode': 204,
-            'body': 'Usuario eliminado'
-        }
+        # Verificar si la eliminación fue exitosa
+        if response.get('Deleted', False):
+            return {
+                'statusCode': 204,
+                'body': json.dumps({'message': 'Usuario eliminado exitosamente'})
+            }
+        else:
+            return {
+                'statusCode': 500,
+                'body': json.dumps({'error': 'No se pudo eliminar el usuario'})
+            }
+
     except Exception as e:
+        # Manejo de errores
         return {
             'statusCode': 500,
             'body': json.dumps({'error': str(e)})
