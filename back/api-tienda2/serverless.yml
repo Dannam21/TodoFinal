@@ -13,20 +13,20 @@ provider:
     USERS_TABLE: ${sls:stage}-usuarios
 
 functions:
-  createProduct:
+  createTienda:
     handler: create_product.handler
     events:
       - http:
-          path: /productos/create
+          path: /tienda/create
           method: post
           cors: true
           integration: lambda
 
-  fetchProduct:
+  fetchTienda:
     handler: fetch_product.handler
     events:
       - http:
-          path: /productos/fetch
+          path: /tienda/fetch
           method: get
           cors: true
           integration: lambda
