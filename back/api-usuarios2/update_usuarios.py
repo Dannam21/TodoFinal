@@ -30,14 +30,14 @@ def lambda_handler(event, context):
                 'body': json.dumps({'error': 'Authorization header is missing'})
             }
 
-        # Construir el payload como un diccionario
+        # Aquí construimos el diccionario con los parámetros necesarios
         payload_dict = {
-            "token": token,
+            "token": token,  # El valor del token que debería llegar como 'Bearer <token>'
             "tenant_id": tenant_id,
             "user_id": user_id
         }
 
-        # Convertir el diccionario a un JSON válido
+        # Convertir el diccionario a una cadena JSON válida
         payload_string = json.dumps(payload_dict)
 
         # Invocar la función Lambda para validar el token
