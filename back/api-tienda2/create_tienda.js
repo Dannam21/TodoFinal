@@ -2,9 +2,17 @@ const AWS = require("aws-sdk");
 const dynamoDB = new AWS.DynamoDB.DocumentClient();
 
 exports.handler = async (event) => {
-    const { tenant_id, datos } = JSON.parse(event.body);
+    let body;
+    
+    if (typeof event.body === 'string') {
+        body = JSON.parse(event.body);
+    } else {
+        body = event.body;
+    }
+
+    const { tenant_id, datos } = body;
     const params = {
-        TableName: "Productos",
+        TableName: "Tienda",
         Item: {
             tenant_id,
             datos,
@@ -14,8 +22,8 @@ exports.handler = async (event) => {
 
     try {
         await dynamoDB.put(params).promise();
-        return { statusCode: 201, body: JSON.stringify({ message: "Producto creado" }) };
+        return { statusCode: 201, body: JSON.stringify({ message: "Tienda creada" }) };
     } catch (error) {
-        return { statusCode: 500, body: JSON.stringify({ message: "Error al crear producto", error }) };
+        return { statusCode: 500, body: JSON.stringify({ message: "Error al crear tienda", error }) };
     }
 };
