@@ -60,7 +60,7 @@ def lambda_handler(event, context):
             KeyConditionExpression=Key('tenant_id').eq(tenant_id) & Key('email').eq(email)
         )
        
-        if response.get('Items').len()>0:
+        if len(response.get('Items', [])) > 0:
             user_item = response['Items'][0]
             payload = {
                 "token": token,
