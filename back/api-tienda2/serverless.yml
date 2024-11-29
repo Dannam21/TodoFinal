@@ -9,7 +9,7 @@ provider:
   iam:
     role: arn:aws:iam::385301667309:role/LabRole  # ARN del rol LabRole
   environment:
-    TIENDA_TABLE: ${sls:stage}-tienda
+    TIENDA_TABLE: ${self:provider.environment.TIENDA_TABLE}  # Usando el nombre de tabla a través de variable de entorno
 
 functions:
   createProduct:
@@ -32,10 +32,10 @@ functions:
 
 resources:
   Resources:
-    ProductosTable:
+    TiendaTable:  # Nombre del recurso de la tabla DynamoDB
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: ${self:provider.environment.TIENDA_TABLE}
+        TableName: ${self:provider.environment.TIENDA_TABLE}  # Usando el nombre de la tabla de entorno
         AttributeDefinitions:
           - AttributeName: tenant_id
             AttributeType: S
@@ -45,4 +45,3 @@ resources:
         BillingMode: PAY_PER_REQUEST
         PointInTimeRecoverySpecification:
           PointInTimeRecoveryEnabled: true
-        

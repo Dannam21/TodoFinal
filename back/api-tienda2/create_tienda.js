@@ -4,17 +4,16 @@ const dynamoDB = new AWS.DynamoDB.DocumentClient();
 exports.handler = async (event) => {
     let body;
 
-    // If the event body is already an object (parsed), use it directly
     if (typeof event.body === "string") {
-        body = JSON.parse(event.body); // Parse if it's a string
+        body = JSON.parse(event.body); // Parse if string
     } else {
-        body = event.body; // Otherwise, assume it's already an object
+        body = event.body; // Already an object
     }
 
     const { tenant_id, datos } = body;
 
     const params = {
-        TableName: "Tienda",
+        TableName: process.env.TIENDA_TABLE,  // Use environment variable
         Item: {
             tenant_id,
             datos,
