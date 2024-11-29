@@ -8,10 +8,11 @@ USERS_TABLE = os.environ['USERS_TABLE']
 table = dynamodb.Table(USERS_TABLE)
 
 def lambda_handler(event, context):
-    tenant_id = event.get('queryStringParameters', {}).get('tenant_id')
-    user_id = event.get('queryStringParameters', {}).get('user_id')
-    email = event.get('queryStringParameters', {}).get('email')
-    print(event)
+    params = json.loads(event['queryStringParameters'])
+    tenant_id = params.get('tenant_id')
+    user_id = params.get('user_id')
+    email = params.get('email')
+    print(params)
 
     token = event['headers']['Authorization']
     lambda_client = boto3.client('lambda')    
