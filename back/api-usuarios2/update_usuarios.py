@@ -31,7 +31,7 @@ def lambda_handler(event, context):
 
 
         invoke_response = lambda_client.invoke(
-            FunctionName="validarTokenAcceso",
+            FunctionName="validar_token_acceso",
             InvocationType='RequestResponse',
             Payload=payload_string
         )
