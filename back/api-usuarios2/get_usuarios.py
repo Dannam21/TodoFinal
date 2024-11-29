@@ -24,7 +24,12 @@ def lambda_handler(event, context):
     
     if tenant_id and user_id:
         ##
-        payload_string = '{ "token": "' + token +','+ '"tenant_id": "' + tenant_id + ','+ '"user_id": "' + user_id+'" }'
+        payload_string = json.dumps({
+            "token": token,
+            "tenant_id": tenant_id,
+            "user_id": user_id
+        })
+
         invoke_response = lambda_client.invoke(FunctionName="ValidarTokenAcceso",
                                            InvocationType='RequestResponse',
                                            Payload = payload_string)
