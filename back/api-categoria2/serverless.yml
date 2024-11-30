@@ -13,7 +13,7 @@ provider:
 
 functions:
   createCategoria:
-    handler: categoria/handler_create_categoria.lambda_handler
+    handler: categoria/create_categoria.lambda_handler
     events:
       - http:
           path: categoria/create
@@ -22,7 +22,7 @@ functions:
       TABLE_NAME: ${self:provider.environment.CATEGORIA_TABLE}
 
   getCategoria:
-    handler: categoria/handler_get_categoria.lambda_handler
+    handler: categoria/get_categoria.lambda_handler
     events:
       - http:
           path: categoria/get
