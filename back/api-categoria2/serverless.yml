@@ -40,7 +40,7 @@ functions:
       TABLE_NAME: ${self:provider.environment.CATEGORIA_TABLE}
 
   listCategorias:
-    handler: categoria/handler_list_categorias.lambda_handler
+    handler: list_categorias.lambda_handler
     events:
       - http:
           path: categoria/list

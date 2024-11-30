@@ -7,11 +7,11 @@ table = dynamodb.Table(table_name)
 
 
 def lambda_handler(event, context):
-    tenant_id = event['queryStringParameters']['tenantID']
+    tenant_id = event['queryStringParameters']['tenant_id']
     limit = int(event['queryStringParameters'].get('limit', 10))
 
     response = table.query(
-        KeyConditionExpression=boto3.dynamodb.conditions.Key('tenantID').eq(tenant_id),
+        KeyConditionExpression=boto3.dynamodb.conditions.Key('tenant_id').eq(tenant_id),
         Limit=limit
     )
 
