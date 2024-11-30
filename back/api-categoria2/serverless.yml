@@ -22,7 +22,7 @@ functions:
       TABLE_NAME: ${self:provider.environment.CATEGORIA_TABLE}
 
   getCategoria:
-    handler: categoria/get_categoria.lambda_handler
+    handler: get_categoria.lambda_handler
     events:
       - http:
           path: categoria/get
@@ -31,7 +31,7 @@ functions:
       TABLE_NAME: ${self:provider.environment.CATEGORIA_TABLE}
 
   deleteCategoria:
-    handler: categoria/handler_delete_categoria.lambda_handler
+    handler: delete_categoria.lambda_handler
     events:
       - http:
           path: categoria/delete

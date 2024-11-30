@@ -11,7 +11,7 @@ def lambda_handler(event, context):
     categoria_id = body['categoria_id']
 
     response = table.delete_item(
-        Key={'tenantID': tenant_id, 'categoriaID': categoria_id}
+        Key={'tenant_id': tenant_id, 'categoria_id': categoria_id}
     )
 
     return {
