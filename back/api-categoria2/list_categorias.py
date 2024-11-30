@@ -12,8 +12,11 @@ table = dynamodb.Table(table_name)
 
 def lambda_handler(event, context):
     try:
+        table_name = os.environ.get('TABLE_NAME', 'DefaultTable') 
+        print(table_name)
         # Log de todo el evento recibido
         logging.info(f"Event recibido: {event}")
+        
         
         # Accede a los parámetros queryStringParameters
         tenant_id = event['queryStringParameters'].get('tenant_id', None)
