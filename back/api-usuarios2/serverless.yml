@@ -26,12 +26,6 @@ functions:
           path: usuarios/delete
           method: delete
 
-  fetchUsuarios:
-    handler: fetch_usuarios.lambda_handler
-    events:
-      - http:
-          path: usuarios/list
-          method: get
 
   getUsuario:
     handler: get_usuarios.lambda_handler
