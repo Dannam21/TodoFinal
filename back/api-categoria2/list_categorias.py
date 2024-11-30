@@ -1,13 +1,13 @@
 import boto3
 import os
-import logging 
+import logging
 import json
 
 def lambda_handler(event, context):
     try:
+        # Obtén el nombre de la tabla desde las variables de entorno
         table_name = os.environ.get('TABLE_NAME', 'DefaultTable') 
-        print(table_name)
-        logging.info(f"Event recibido: {event}")
+        logging.info(f"Nombre de la tabla: {table_name}")
         
         # Accede a los parámetros queryStringParameters
         tenant_id = event['queryStringParameters'].get('tenant_id', None)
@@ -31,11 +31,19 @@ def lambda_handler(event, context):
 
         logging.info(f"Parámetros recibidos - tenant_id: {tenant_id}, limit: {limit}")
         
-        response = table_name.query(
+        # Crear el recurso DynamoDB
+        dynamodb = boto3.resource('dynamodb')
+        
+        # Obtener la tabla de DynamoDB usando el nombre de la tabla
+        table = dynamodb.Table(table_name)
+        
+        # Ejecutar la consulta en la tabla
+        response = table.query(
             KeyConditionExpression=boto3.dynamodb.conditions.Key('tenant_id').eq(tenant_id),
             Limit=limit
         )
 
+        # Obtener los elementos de la respuesta
         items = response.get('Items', [])
 
         logging.info(f"Items encontrados: {items}")
