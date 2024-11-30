@@ -11,7 +11,7 @@ def lambda_handler(event, context):
     tenant_id = event['queryStringParameters']['tenant_id']
 
     response = table.get_item(
-        Key={'tenant_id': tenant_id, 'categoria_is': categoria_id}
+        Key={'tenant_id': tenant_id, 'categoria_id': categoria_id}
     )
 
     item = response.get('Item')
