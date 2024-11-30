@@ -16,6 +16,8 @@ def lambda_handler(event, context):
         print(table_name)
         # Log de todo el evento recibido
         logging.info(f"Event recibido: {event}")
+
+        print(event)
         
         
         # Accede a los parámetros queryStringParameters
