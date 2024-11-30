@@ -5,8 +5,11 @@ import json
 
 from boto3.dynamodb.conditions import Key
 
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
 dynamodb = boto3.resource('dynamodb')
-table_name = os.environ['TABLE_NAME']
+table_name = os.environ['PRODUCTS_TABLE']
 table = dynamodb.Table(table_name)
 
 def lambda_handler(event, context):
