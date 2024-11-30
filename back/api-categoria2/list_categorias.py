@@ -51,10 +51,14 @@ def lambda_handler(event, context):
         )
 
         print(response)
-        
+
         # Log la respuesta de DynamoDB
         items = response.get('Items', [])
+
+        print(items)
         logging.info(f"Items encontrados: {items}")
+
+        
 
         return {
             'statusCode': 200,
