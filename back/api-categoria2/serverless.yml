@@ -71,10 +71,11 @@ resources:
           - AttributeName: nombre
             AttributeType: S
         KeySchema:
+          - AttributeName: tenant_id
+            KeyType: HASH   # Clave de partición
           - AttributeName: categoria_id
-            KeyType: HASH
-          - AttributeName: nombre
-            KeyType: RANGE  # Agregar clave de rango a la tabla principal
+            KeyType: RANGE  # Clave de ordenación
+        # Agregar clave de rango a la tabla principal
         LocalSecondaryIndexes:
           - IndexName: LSI_Nombre
             KeySchema:
@@ -88,12 +89,13 @@ resources:
           - IndexName: GSI_TenantID
             KeySchema:
               - AttributeName: tenant_id
-                KeyType: HASH
+                KeyType: HASH  # Se usa 'tenant_id' para las consultas por inquilino
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
               ReadCapacityUnits: 5
               WriteCapacityUnits: 5
+
         ProvisionedThroughput:
           ReadCapacityUnits: 5
           WriteCapacityUnits: 5
