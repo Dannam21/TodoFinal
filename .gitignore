@@ -1,0 +1,45 @@
+# PyCharm
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+*.egg-info/
+
+# Distribution / packaging
+.Python
+build/
+dist/
+downloads/
+eggs/
+*.egg
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Pytest
+.cache/
+
+# PyCharm specific caches
+.idea/.idea_modules
+.idea/.name
+.idea/*.iml
+.idea/modules.xml
+.idea/workspace.xml
+.idea/misc.xml
+
+# Virtualenv
+.venv/
