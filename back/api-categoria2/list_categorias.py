@@ -31,7 +31,7 @@ def lambda_handler(event, context):
 
         logging.info(f"Parámetros recibidos - tenant_id: {tenant_id}, limit: {limit}")
         
-        response = table.query(
+        response = table_name.query(
             KeyConditionExpression=boto3.dynamodb.conditions.Key('tenant_id').eq(tenant_id),
             Limit=limit
         )
