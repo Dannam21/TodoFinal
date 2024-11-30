@@ -19,7 +19,6 @@ def lambda_handler(event, context):
         'tenantID': tenant_id,
         'categoriaID': categoria_id,
         'nombre': nombre,
-        'fechaCreacion': fecha_creacion,
         'data': data
     }
 
@@ -29,7 +28,6 @@ def lambda_handler(event, context):
         'statusCode': 201,
         'body': {
             'message': 'Categoría creada',
-            'categoriaID': categoria_id,
-            'fechaCreacion': fecha_creacion
+            'categoriaID': categoria_id
         }
     }
