@@ -12,32 +12,42 @@ table = dynamodb.Table(table_name)
 
 def lambda_handler(event, context):
     try:
-        # Registra todo el contenido del evento
-        logging.info(f"Event received: {event}")
+        # Log de todo el evento recibido
+        logging.info(f"Event recibido: {event}")
         
         # Accede a los parámetros queryStringParameters
         tenant_id = event['queryStringParameters'].get('tenant_id', None)
-        limit = int(event['queryStringParameters'].get('limit', 10))
+        limit = event['queryStringParameters'].get('limit', 10)
         
-        # Verifica si el tenant_id está presente
-        if not tenant_id:
-            logging.error("tenant_id is missing")
+        # Asegúrate de que `tenant_id` está presente
+        if tenant_id is None:
+            logging.error("tenant_id es obligatorio")
             return {
                 'statusCode': 400,
-                'body': {'message': 'tenant_id is required'}
+                'body': {'message': 'tenant_id es obligatorio'}
+            }
+        
+        # Convertir `limit` a entero, si es posible
+        try:
+            limit = int(limit)
+        except ValueError:
+            logging.error("Limit no es un número válido")
+            return {
+                'statusCode': 400,
+                'body': {'message': 'limit debe ser un número entero'}
             }
 
-        logging.info(f"tenant_id: {tenant_id}, limit: {limit}")
+        logging.info(f"Parámetros recibidos - tenant_id: {tenant_id}, limit: {limit}")
         
         # Realiza la consulta en DynamoDB
         response = table.query(
             KeyConditionExpression=boto3.dynamodb.conditions.Key('tenant_id').eq(tenant_id),
             Limit=limit
         )
-        
-        # Registra la respuesta de DynamoDB
+
+        # Log la respuesta de DynamoDB
         items = response.get('Items', [])
-        logging.info(f"Items found: {items}")
+        logging.info(f"Items encontrados: {items}")
 
         return {
             'statusCode': 200,
@@ -47,11 +57,12 @@ def lambda_handler(event, context):
         }
     
     except Exception as e:
-        # Captura cualquier error inesperado
-        logging.error(f"Unexpected error: {str(e)}")
+        # Captura cualquier error inesperado y lo loguea
+        logging.error(f"Error inesperado: {str(e)}")
         return {
             'statusCode': 500,
             'body': {
-                'message': f"Internal Server Error: {str(e)}"
+                'message': f"Error interno del servidor: {str(e)}"
             }
         }
+
