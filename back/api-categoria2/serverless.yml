@@ -64,21 +64,21 @@ resources:
       Properties:
         TableName: ${self:provider.environment.CATEGORIA_TABLE}
         AttributeDefinitions:
-          - AttributeName: categoriaID
+          - AttributeName: categoria_id
             AttributeType: S
-          - AttributeName: tenantID
+          - AttributeName: tenant_id
             AttributeType: S
           - AttributeName: nombre
             AttributeType: S
         KeySchema:
-          - AttributeName: categoriaID
+          - AttributeName: categoria_id
             KeyType: HASH
           - AttributeName: nombre
             KeyType: RANGE  # Agregar clave de rango a la tabla principal
         LocalSecondaryIndexes:
           - IndexName: LSI_Nombre
             KeySchema:
-              - AttributeName: categoriaID
+              - AttributeName: categoria_id
                 KeyType: HASH
               - AttributeName: nombre
                 KeyType: RANGE
@@ -87,7 +87,7 @@ resources:
         GlobalSecondaryIndexes:
           - IndexName: GSI_TenantID
             KeySchema:
-              - AttributeName: tenantID
+              - AttributeName: tenant_id
                 KeyType: HASH
             Projection:
               ProjectionType: ALL
