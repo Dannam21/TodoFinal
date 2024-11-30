@@ -75,11 +75,10 @@ resources:
             KeyType: HASH   # Clave de partición
           - AttributeName: categoria_id
             KeyType: RANGE  # Clave de ordenación
-        # Agregar clave de rango a la tabla principal
         LocalSecondaryIndexes:
           - IndexName: LSI_Nombre
             KeySchema:
-              - AttributeName: categoria_id
+              - AttributeName: tenant_id  # Usamos 'tenant_id' como clave de partición para el LSI
                 KeyType: HASH
               - AttributeName: nombre
                 KeyType: RANGE
