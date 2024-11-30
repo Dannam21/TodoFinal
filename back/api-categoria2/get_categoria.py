@@ -7,7 +7,7 @@ table = dynamodb.Table(table_name)
 
 
 def lambda_handler(event, context):
-    categoria_id = event['queryStringParameters']['categoria_is']
+    categoria_id = event['queryStringParameters']['categoria_id']
     tenant_id = event['queryStringParameters']['tenant_id']
 
     response = table.get_item(
