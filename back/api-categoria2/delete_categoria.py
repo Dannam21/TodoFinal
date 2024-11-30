@@ -16,25 +16,29 @@ def lambda_handler(event, context):
     categoria_id = body['categoria_id']
     tenant_id = body['tenant_id']
 
-    # Agregar depuración para ver los valores recibidos
-    print(f"Received categoria_id: {categoria_id}, tenant_id: {tenant_id}")
+    # Verificar si el ítem existe antes de eliminarlo
+    response = table.get_item(
+        Key={
+            'categoria_id': categoria_id,
+            'tenant_id': tenant_id
+        }
+    )
 
+    if 'Item' not in response:
+        print(f"Item with categoria_id: {categoria_id} and tenant_id: {tenant_id} not found.")
+        return {
+            'statusCode': 404,
+            'body': json.dumps('Categoría no encontrada')
+        }
+
+    # Si el ítem existe, proceder con la eliminación
     try:
-        # Eliminar el item usando categoria_id y tenant_id como claves
-        response = table.delete_item(
+        delete_response = table.delete_item(
             Key={
                 'categoria_id': categoria_id,
                 'tenant_id': tenant_id
             }
         )
-
-        # Comprobación de la respuesta para asegurar que el ítem se eliminó
-        if 'Attributes' not in response:
-            print(f"Item with categoria_id: {categoria_id} and tenant_id: {tenant_id} not found.")
-            return {
-                'statusCode': 404,
-                'body': json.dumps('Categoría no encontrada')
-            }
 
         return {
             'statusCode': 200,
