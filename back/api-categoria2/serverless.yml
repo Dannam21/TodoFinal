@@ -13,7 +13,7 @@ provider:
 
 functions:
   createCategoria:
-    handler: categoria/create_categoria.lambda_handler
+    handler: create_categoria.lambda_handler
     events:
       - http:
           path: categoria/create
