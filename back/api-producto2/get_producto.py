@@ -34,7 +34,8 @@ def lambda_handler(event, context):
 
         # Obtener los ítems de la respuesta
         items = response.get('Items', [])
-
+        print(items)
+        
         if not items:
             # Si no hay productos encontrados, retornar un mensaje adecuado
             return {
