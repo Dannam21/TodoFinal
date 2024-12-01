@@ -20,8 +20,8 @@ def lambda_handler(event, context):
         # Realizar la consulta usando la clave de partición y la clave de ordenamiento (producto_id)
         response = table.get_item(
             Key={
-                'tenant_id#categoria_nombre': partition_key,  # Clave de partición correcta
-                'producto_id': producto_id  # Clave de ordenamiento correcta
+                'tenant_id#categoria_nombre': partition_key,  # Clave de partición
+                'producto_id': producto_id  # Clave de ordenamiento
             }
         )
 
