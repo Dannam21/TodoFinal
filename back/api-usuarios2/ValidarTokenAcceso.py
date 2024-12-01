@@ -10,6 +10,7 @@ tokens_table = dynamodb.Table(TOKENS_TABLE)
 def lambda_handler(event, context):
     try:
         # Log the received event
+        print(event)
         params = event.get('queryStringParameters', {})
         token = params.get('token')
         role = params.get('role')
