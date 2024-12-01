@@ -19,46 +19,50 @@ def lambda_handler(event, context):
         # Obtener los parámetros de la consulta
         tenant_id = event['queryStringParameters'].get('tenant_id')
         categoria_nombre = event['queryStringParameters'].get('categoria_nombre')
+        producto_id = event['queryStringParameters'].get('producto_id')
 
         # Validación de parámetros obligatorios
-        if not tenant_id or not categoria_nombre:
+        if not tenant_id or not categoria_nombre or not producto_id:
             return {
                 'statusCode': 400,
                 'body': json.dumps({
-                    'error': 'Missing required parameters (tenant_id, categoria_nombre)'
+                    'error': 'Missing required parameters (tenant_id, categoria_nombre, producto_id)'
                 })
             }
 
-        # Crear la clave de partición
+        # Crear la clave de partición y clave de ordenamiento
         partition_key = f"{tenant_id}#{categoria_nombre}"
 
-        # Realizar una consulta para obtener los productos
-        response = table.query(
-            KeyConditionExpression=boto3.dynamodb.conditions.Key('tenant_id#categoria_nombre').eq(partition_key)
+        # Realizar la consulta para obtener el producto por producto_id
+        response = table.get_item(
+            Key={
+                'tenant_id#categoria_nombre': partition_key,
+                'producto_id': producto_id
+            }
         )
 
-        # Verificar si hay productos
-        if 'Items' not in response or not response['Items']:
+        # Verificar si el producto existe
+        if 'Item' not in response:
             return {
                 'statusCode': 404,
                 'body': json.dumps({
-                    'message': 'No products found for the given tenant_id and categoria_nombre'
+                    'message': 'Producto no encontrado para el producto_id y la combinación de tenant_id y categoria_nombre'
                 })
             }
 
-        # Devolver los productos encontrados
+        # Devolver el producto encontrado
         return {
             'statusCode': 200,
             'body': json.dumps({
-                'productos': response['Items']
+                'producto': response['Item']
             })
         }
 
     except Exception as e:
-        logger.error("Error obteniendo los productos: %s", str(e))
+        logger.error("Error obteniendo el producto: %s", str(e))
         return {
             'statusCode': 500,
             'body': json.dumps({
-                'error': f'Error obteniendo los productos: {str(e)}'
+                'error': f'Error obteniendo el producto: {str(e)}'
             })
         }
