@@ -27,7 +27,6 @@ exports.handler = async (event) => {
         await dynamoDB.put(params).promise();
         return { statusCode: 201, body: JSON.stringify({ message: "Pedido creado" }) };
     } catch (error) {
-        console.error("Error creating order:", error);
         return { statusCode: 500, body: JSON.stringify({ message: "Error al crear pedido", error }) };
     }
 };

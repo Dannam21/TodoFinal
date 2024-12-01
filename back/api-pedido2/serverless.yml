@@ -9,24 +9,23 @@ provider:
   iam:
     role: arn:aws:iam::385301667309:role/LabRole  # ARN del rol LabRole
   environment:
-    PRODUCTS_TABLE: ${sls:stage}-productos
-    USERS_TABLE: ${sls:stage}-usuarios
+    PEDIDOS_TABLE: ${sls:stage}-pedidos
 
 functions:
-  createProduct:
-    handler: create_product.handler
+  createOrder:
+    handler: create_order.handler
     events:
       - http:
-          path: /productos/create
+          path: /pedidos/create
           method: post
           cors: true
           integration: lambda
 
-  fetchProduct:
-    handler: fetch_product.handler
+  fetchOrder:
+    handler: fetch_order.handler
     events:
       - http:
-          path: /productos/fetch
+          path: /pedidos/fetch
           method: get
           cors: true
           integration: lambda
@@ -51,58 +50,42 @@ functions:
 
 resources:
   Resources:
-    ProductosTable:
+    PedidosTable:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: ${self:provider.environment.PRODUCTS_TABLE}
+        TableName: ${self:provider.environment.PEDIDOS_TABLE}
         AttributeDefinitions:
-          - AttributeName: tenantID
+          - AttributeName: tenant_id#producto_id
             AttributeType: S
-          - AttributeName: productoID
+          - AttributeName: pedido_id
             AttributeType: S
-          - AttributeName: nombre
-            AttributeType: S # Atributo faltante agregado
+          - AttributeName: estado
+            AttributeType: S
+          - AttributeName: tenant_id#usuario_id
+            AttributeType: S
         KeySchema:
-          - AttributeName: tenantID
+          - AttributeName: tenant_id#producto_id
             KeyType: HASH
-          - AttributeName: productoID
+          - AttributeName: pedido_id
             KeyType: RANGE
         BillingMode: PAY_PER_REQUEST
         PointInTimeRecoverySpecification:
           PointInTimeRecoveryEnabled: true
         LocalSecondaryIndexes:
-          - IndexName: ProductoIndex
+          - IndexName: EstadoIndex
             KeySchema:
-              - AttributeName: tenantID
+              - AttributeName: tenant_id#producto_id
                 KeyType: HASH
-              - AttributeName: nombre
+              - AttributeName: estado
                 KeyType: RANGE
             Projection:
               ProjectionType: ALL
         GlobalSecondaryIndexes:
-          - IndexName: UsuarioIndex
+          - IndexName: UsuarioEstadoIndex
             KeySchema:
-              - AttributeName: tenantID
+              - AttributeName: tenant_id#usuario_id
                 KeyType: HASH
-              - AttributeName: productoID
+              - AttributeName: estado
                 KeyType: RANGE
             Projection:
               ProjectionType: ALL
-
-    UsuariosTable:
-      Type: AWS::DynamoDB::Table
-      Properties:
-        TableName: ${self:provider.environment.USERS_TABLE}
-        AttributeDefinitions:
-          - AttributeName: tenantID
-            AttributeType: S
-          - AttributeName: email
-            AttributeType: S
-        KeySchema:
-          - AttributeName: tenantID
-            KeyType: HASH
-          - AttributeName: email
-            KeyType: RANGE
-        BillingMode: PAY_PER_REQUEST
-        PointInTimeRecoverySpecification:
-          PointInTimeRecoveryEnabled: true
