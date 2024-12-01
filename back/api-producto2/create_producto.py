@@ -24,15 +24,26 @@ def lambda_handler(event, context):
         tenant_id = body.get('tenant_id')
         categoria_nombre = body.get('categoria_nombre')
         nombre = body.get('nombre')
-        stock = body.get('stock')
+        stock = body.get('stock')  # Se espera que 'stock' sea un número entero
         precio = body.get('precio')
 
         # Validación de parámetros obligatorios
-        if not tenant_id or not categoria_nombre or not nombre or not stock or not precio:
+        if not tenant_id or not categoria_nombre or not nombre or stock is None or not precio:
             return {
                 'statusCode': 400,
                 'body': json.dumps({
                     'error': 'Missing required data (tenant_id, categoria_nombre, nombre, stock, precio)'
+                })
+            }
+
+        # Asegúrate de convertir el stock a int si es necesario
+        try:
+            stock = int(stock)  # Convertir a entero
+        except ValueError:
+            return {
+                'statusCode': 400,
+                'body': json.dumps({
+                    'error': 'El stock debe ser un número entero válido'
                 })
             }
 
@@ -49,7 +60,7 @@ def lambda_handler(event, context):
             'tenant_id': tenant_id,
             'categoria_nombre': categoria_nombre,
             'nombre': nombre,
-            'stock': stock,
+            'stock': stock,  # Guardar como int
             'precio': precio
         }
 
