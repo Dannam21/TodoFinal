@@ -17,7 +17,6 @@ def lambda_handler(event, context):
         tenant_id = event['queryStringParameters'].get('tenant_id', None)
         categoria_nombre = event['queryStringParameters'].get('categoria_nombre', None)
         producto_id = event['queryStringParameters'].get('producto_id', None)
-        stock = event['queryStringParameters'].get('stock', None)
         
         # Verificar si todos los parámetros requeridos están presentes
         if not tenant_id or not categoria_nombre or not producto_id:
@@ -40,6 +39,7 @@ def lambda_handler(event, context):
             KeyConditionExpression=boto3.dynamodb.conditions.Key('tenant_id').eq(tenant_id) &
                                    boto3.dynamodb.conditions.Key('producto_id').eq(producto_id)
         )
+        
 
         # Revisar los resultados de la consulta
         logger.info(f"Respuesta de DynamoDB: {json.dumps(response, indent=2)}")
