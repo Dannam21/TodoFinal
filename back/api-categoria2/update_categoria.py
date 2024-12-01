@@ -27,23 +27,23 @@ def lambda_handler(event, context):
         # Obtener los parámetros necesarios
         tenant_id = body.get('tenant_id')
         categoria_id = body.get('categoria_id')
-        nuevo_nombre = body.get('nuevo_nombre')
+        nombre = body.get('nombre')
         
         # Validación de parámetros
-        if not tenant_id or not categoria_id or not nuevo_nombre:
-            logger.error("Faltan parámetros obligatorios: tenant_id, categoria_id o nuevo_nombre")
+        if not tenant_id or not categoria_id or not nombre:
+            logger.error("Faltan parámetros obligatorios: tenant_id, categoria_id o nombre")
             return {
                 'statusCode': 400,
-                'body': json.dumps({'message': 'tenant_id, categoria_id y nuevo_nombre son obligatorios'})
+                'body': json.dumps({'message': 'tenant_id, categoria_id y nombre son obligatorios'})
             }
 
-        logger.info(f"Actualizando categoría: tenant_id={tenant_id}, categoria_id={categoria_id}, nuevo_nombre={nuevo_nombre}")
+        logger.info(f"Actualizando categoría: tenant_id={tenant_id}, categoria_id={categoria_id}, nombre={nombre}")
         
         # Realizar la actualización en DynamoDB
         response = table.update_item(
             Key={'tenantID': tenant_id, 'categoriaID': categoria_id},
             UpdateExpression="SET nombre = :nombre",
-            ExpressionAttributeValues={':nombre': nuevo_nombre},
+            ExpressionAttributeValues={':nombre': nombre},
             ReturnValues="ALL_NEW"
         )
 
