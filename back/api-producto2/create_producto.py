@@ -11,7 +11,7 @@ logger.setLevel(logging.INFO)
 
 # Inicialización de recursos DynamoDB
 dynamodb = boto3.resource('dynamodb')
-table_name = os.environ['PRODUCTO_TABLE']
+table_name = os.environ['PRODUCTO_TABLE']  # Asegúrate de que esta variable esté correctamente configurada
 table = dynamodb.Table(table_name)
 
 def lambda_handler(event, context):
@@ -43,16 +43,17 @@ def lambda_handler(event, context):
         # Crear la clave de partición utilizando tenant_id y categoria_nombre
         partition_key = f"{tenant_id}#{categoria_nombre}"
 
-        # Realizar una consulta para verificar si ya existe un producto con ese nombre en esa categoría
+        # Verificar si ya existe un producto con ese nombre en esa categoría
+        # En este caso, la consulta debe buscar con la clave de partición y la clave de ordenación (stock)
         response = table.query(
-            KeyConditionExpression=Key('tenant_id#categoria_nombre').eq(partition_key) & Key('producto_id').eq(nombre)
+            KeyConditionExpression=Key('tenant_id#categoria_nombre').eq(partition_key) & Key('stock').eq(stock)
         )
 
         if response['Items']:
             return {
                 'statusCode': 400,
                 'body': json.dumps({
-                    'error': 'Product already exists for this name in this category'
+                    'error': 'Product already exists for this name in this category with this stock'
                 })
             }
 
