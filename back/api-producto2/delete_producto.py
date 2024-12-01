@@ -1,63 +1,56 @@
 import boto3
 import os
 import json
-from decimal import Decimal
-
+from datetime import datetime
 
 # Inicializar recursos DynamoDB
 dynamodb = boto3.resource('dynamodb')
 table_name = os.environ['TABLE_NAME']
 table = dynamodb.Table(table_name)
 
+TOKENS_TABLE = os.environ['TOKENS_TABLE']
+tokens_table = dynamodb.Table(TOKENS_TABLE)
+
 def lambda_handler(event, context):
     try:
         # Decodificar el cuerpo de la solicitud
         body = json.loads(event['body'])
 
-
-        token = event['headers'].get('Authorization')
-
-        if not token:
-            return {
-                'statusCode': 400,
-                'body': json.dumps({'error': 'Authorization token is missing'})
-            }
-
-        # Crear el cliente de Lambda para invocar la función de validación del token
-        lambda_client = boto3.client('lambda')
-
-        payload = {
-            "token": token,
-            "role": "admin"
-        }
-
-        invoke_response = lambda_client.invoke(
-            FunctionName="api-usuarios-dev-ValidarTokenAcceso",  # Asegúrate de que el nombre de la función sea correcto
-            InvocationType='RequestResponse',
-            Payload=json.dumps(payload)
-        )
-
-        # Leer la respuesta de la validación del token
-        response1 = json.loads(invoke_response['Payload'].read().decode())
-        logger.info("Token validation response: %s", response1)
-
-        if response1['statusCode'] != 200:
-            return {
-                'statusCode': 403,
-                'body': json.dumps({'error': 'Forbidden - Acceso No Autorizado'})
-            }
-
-
-
         # Extraer parámetros
+        token = body.get('token')
         tenant_id = body.get('tenant_id')
         producto_id = body.get('producto_id')
 
         # Validar parámetros
-        if not tenant_id or not producto_id:
+        if not token or not tenant_id or not producto_id:
             return {
                 'statusCode': 400,
-                'body': json.dumps({'error': 'tenant_id y producto_id son requeridos'})
+                'body': json.dumps({'error': 'token, tenant_id y producto_id son requeridos'})
+            }
+
+        # Validar el token en la tabla de tokens
+        token_response = tokens_table.get_item(Key={'token': token})
+        token_data = token_response.get('Item')
+
+        if not token_data:
+            return {
+                'statusCode': 403,
+                'body': json.dumps({'error': 'Token no válido'})
+            }
+
+        # Verificar si el token ha expirado
+        expires = datetime.strptime(token_data['expires'], '%Y-%m-%d %H:%M:%S')
+        if datetime.utcnow() > expires:
+            return {
+                'statusCode': 403,
+                'body': json.dumps({'error': 'Token expirado'})
+            }
+
+        # Validar si el rol es "admin"
+        if token_data.get('role') != 'admin':
+            return {
+                'statusCode': 403,
+                'body': json.dumps({'error': 'Solo los administradores pueden eliminar productos'})
             }
 
         # Intentar eliminar el producto
