@@ -3,7 +3,6 @@ import uuid
 import os
 import json
 import logging
-from boto3.dynamodb.conditions import Key
 
 # Configuración de logging
 logger = logging.getLogger()
@@ -11,7 +10,7 @@ logger.setLevel(logging.INFO)
 
 # Inicialización de recursos DynamoDB
 dynamodb = boto3.resource('dynamodb')
-table_name = os.environ['PRODUCTO_TABLE']  # Asegúrate de que esta variable esté correctamente configurada
+table_name = os.environ['TABLE_NAME']
 table = dynamodb.Table(table_name)
 
 def lambda_handler(event, context):
@@ -41,22 +40,7 @@ def lambda_handler(event, context):
         producto_id = str(uuid.uuid4())
 
         # Crear la clave de partición utilizando tenant_id y categoria_nombre
-        # Crear la clave de partición utilizando tenant_id y categoria_nombre
         partition_key = f"{tenant_id}#{categoria_nombre}"
-
-        # Realizar una consulta para verificar si ya existe un producto con ese nombre en esa categoría
-        response = table.query(
-            KeyConditionExpression=Key('tenant_id#categoria_nombre').eq(partition_key) & Key('producto_id').eq(nombre)
-        )
-
-
-        if response['Items']:
-            return {
-                'statusCode': 400,
-                'body': json.dumps({
-                    'error': 'Product already exists for this name in this category with this stock'
-                })
-            }
 
         # Crear el nuevo producto
         producto = {
