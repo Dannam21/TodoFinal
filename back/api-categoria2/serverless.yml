@@ -49,7 +49,7 @@ functions:
       TABLE_NAME: ${self:provider.environment.CATEGORIA_TABLE}
 
   updateCategoria:
-    handler: categoria/handler_update_categoria.lambda_handler
+    handler: update_categoria.lambda_handler
     events:
       - http:
           path: categoria/update
