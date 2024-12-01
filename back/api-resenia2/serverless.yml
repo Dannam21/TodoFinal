@@ -37,20 +37,19 @@ resources:
             AttributeType: S
           - AttributeName: fecha
             AttributeType: S
-          # tenant_producto_id no es un atributo físico, lo concatenamos en la Lambda
         KeySchema:
-          - AttributeName: tenant_id_producto_id
-            KeyType: HASH  # La clave de partición será la combinación de tenant_id + producto_id
+          - AttributeName: tenant_id
+            KeyType: HASH  # La clave de partición será tenant_id
           - AttributeName: resenia_id
             KeyType: RANGE  # La clave de ordenamiento será resenia_id
         BillingMode: PAY_PER_REQUEST
         LocalSecondaryIndexes:
           - IndexName: FechaIndex
             KeySchema:
-              - AttributeName: tenant_id_producto_id
-                KeyType: HASH
+              - AttributeName: tenant_id
+                KeyType: HASH  # Clave de partición: tenant_id
               - AttributeName: fecha
-                KeyType: RANGE
+                KeyType: RANGE  # Clave de ordenamiento: fecha
             Projection:
               ProjectionType: ALL
         GlobalSecondaryIndexes:
