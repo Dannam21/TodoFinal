@@ -14,13 +14,11 @@ dynamodb = boto3.resource('dynamodb')
 table_name = os.environ['TABLE_NAME']
 table = dynamodb.Table(table_name)
 
-
 # Función para convertir Decimal a float
 def decimal_default(obj):
     if isinstance(obj, Decimal):
         return float(obj)  # Convertir Decimal a float
     raise TypeError("Type not serializable")
-
 
 def lambda_handler(event, context):
     try:
@@ -127,7 +125,7 @@ def lambda_handler(event, context):
             'body': json.dumps({
                 'message': 'Producto creado',
                 'producto': producto,
-            }, default=decimal_default)  # Usar decimal_default para convertir Decimal a float
+            }, default=decimal_default)  # Convert Decimal to float during JSON serialization
         }
 
     except Exception as e:
