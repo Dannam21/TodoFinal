@@ -15,13 +15,11 @@ const crearResenia = async (event) => {
             };
         }
 
-        // Generar el ID de la reseña
         const resenia_id = uuid.v4();
 
-        // Crear el atributo combinado tenant_id_producto_id
+        // Crear el atributo combinado tenant_id_producto_id en la Lambda
         const tenant_id_producto_id = `${tenant_id}#${producto_id}`;
 
-        // Crear el objeto de la reseña
         const resenia = {
             tenant_id,
             producto_id,
@@ -31,8 +29,8 @@ const crearResenia = async (event) => {
                 puntaje,
                 comentario
             },
-            tenant_id_producto_id,  // Esto no es necesario en KeySchema, solo lo guardamos aquí
-            fecha: new Date().toISOString() // Se puede usar para indexar por fecha si es necesario
+            tenant_id_producto_id,  // Solo lo guardamos aquí, no en el KeySchema de DynamoDB
+            fecha: new Date().toISOString()  // Puede ser útil si necesitas indexar por fecha
         };
 
         const params = {
@@ -40,7 +38,6 @@ const crearResenia = async (event) => {
             Item: resenia
         };
 
-        // Guardar la reseña en DynamoDB
         await dynamodb.put(params).promise();
 
         return {

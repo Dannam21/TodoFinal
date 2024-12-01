@@ -28,7 +28,7 @@ resources:
       Properties:
         TableName: ${self:provider.environment.TABLE_NAME}
         AttributeDefinitions:
-          # Definimos todos los atributos usados en el KeySchema
+          # Definimos los atributos usados en el KeySchema
           - AttributeName: tenant_id
             AttributeType: S
           - AttributeName: producto_id
@@ -38,18 +38,20 @@ resources:
           - AttributeName: fecha
             AttributeType: S
         KeySchema:
-          - AttributeName: tenant_id
-            KeyType: HASH  # La clave de partición será tenant_id
-          - AttributeName: resenia_id
-            KeyType: RANGE  # La clave de ordenamiento será resenia_id
+          - AttributeName: tenant_id  # Clave de partición HASH
+            KeyType: HASH
+          - AttributeName: producto_id  # Parte de la clave combinada
+            KeyType: RANGE
+          - AttributeName: resenia_id  # Clave de ordenación RANGE
+            KeyType: RANGE
         BillingMode: PAY_PER_REQUEST
         LocalSecondaryIndexes:
           - IndexName: FechaIndex
             KeySchema:
               - AttributeName: tenant_id
-                KeyType: HASH  # Clave de partición: tenant_id
+                KeyType: HASH
               - AttributeName: fecha
-                KeyType: RANGE  # Clave de ordenamiento: fecha
+                KeyType: RANGE
             Projection:
               ProjectionType: ALL
         GlobalSecondaryIndexes:
