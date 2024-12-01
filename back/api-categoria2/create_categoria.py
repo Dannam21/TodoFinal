@@ -3,6 +3,11 @@ import uuid
 import datetime
 import os
 import json  # Importar json para deserializar el cuerpo si es necesario
+import logging
+
+# Configurar logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger()
 
 dynamodb = boto3.resource('dynamodb')
 table_name = os.environ['TABLE_NAME']
@@ -34,7 +39,13 @@ def lambda_handler(event, context):
 
         # Leer la respuesta de la validación del token
         response1 = json.loads(invoke_response['Payload'].read().decode())
-        if response1['statusCode'] != 200:
+        
+        # Log para depurar la respuesta
+        logger.info(f"Respuesta de validación de token: {response1}")
+
+        # Verificar si el token es válido
+        if response1.get('statusCode') != 200:
+            logger.error("El token no es válido o no tiene permisos de administrador")
             return {
                 'statusCode': 403,
                 'body': json.dumps({'error': 'Forbidden - Solo los administradores pueden crear categorías'})
@@ -76,6 +87,7 @@ def lambda_handler(event, context):
 
     except Exception as e:
         # Manejar errores de ejecución
+        logger.error(f"Error creando la categoría: {str(e)}")
         return {
             'statusCode': 500,
             'body': json.dumps({'error': f'Error creando la categoría: {str(e)}'})
