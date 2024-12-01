@@ -11,7 +11,7 @@ logger.setLevel(logging.INFO)
 
 # Inicialización de recursos DynamoDB
 dynamodb = boto3.resource('dynamodb')
-table_name = os.environ['PRODUCTS_TABLE']
+table_name = os.environ['PRODUCTO_TABLE']
 table = dynamodb.Table(table_name)
 
 def lambda_handler(event, context):
