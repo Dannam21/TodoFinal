@@ -9,10 +9,18 @@ const crearResenia = async (event) => {
 
         const { tenant_id, producto_id, usuario_id, puntaje, comentario } = body;
 
+        // Validación de datos
         if (!tenant_id || !producto_id || !usuario_id || !puntaje || !comentario) {
             return {
                 statusCode: 400,
                 body: JSON.stringify({ message: "Datos incompletos" })
+            };
+        }
+
+        if (puntaje < 1 || puntaje > 5) {
+            return {
+                statusCode: 400,
+                body: JSON.stringify({ message: "El puntaje debe estar entre 1 y 5" })
             };
         }
 
@@ -36,11 +44,11 @@ const crearResenia = async (event) => {
         await dynamodb.put(params).promise();
 
         return {
-            statusCode: 200,
+            statusCode: 201,
             body: JSON.stringify({ message: "Reseña creada exitosamente", resenia })
         };
     } catch (error) {
-        console.error(error);
+        console.error("Error al insertar la reseña en DynamoDB:", error);
         return {
             statusCode: 500,
             body: JSON.stringify({ message: "Error al crear la reseña", error: error.message })
