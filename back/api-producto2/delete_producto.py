@@ -23,15 +23,16 @@ def lambda_handler(event, context):
                 'body': json.dumps({'error': 'tenant_id y producto_id son requeridos'})
             }
 
-        # Eliminar el producto
+        # Intentar eliminar el producto
         response = table.delete_item(
             Key={
-                'tenant_id': tenant_id,  # Usar el nombre correcto de la clave
-                'producto_id': producto_id  # Usar el nombre correcto de la clave
-            }
+                'tenant_id': tenant_id,
+                'producto_id': producto_id
+            },
+            ReturnValues="ALL_OLD"  # Solicitar los datos del producto eliminado
         )
 
-        # Verificar si se eliminó el producto
+        # Verificar si el producto existía
         if 'Attributes' not in response:
             return {
                 'statusCode': 404,
@@ -41,7 +42,10 @@ def lambda_handler(event, context):
         # Respuesta de éxito
         return {
             'statusCode': 200,
-            'body': json.dumps({'message': 'Producto eliminado'})
+            'body': json.dumps({
+                'message': 'Producto eliminado',
+                'producto_eliminado': response['Attributes']
+            })
         }
 
     except Exception as e:
