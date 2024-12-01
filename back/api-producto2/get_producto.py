@@ -33,6 +33,9 @@ def lambda_handler(event, context):
         # Crear la clave de partición y clave de ordenamiento
         partition_key = f"{tenant_id}#{categoria_nombre}"
 
+        # Log para depuración
+        logger.info(f"Consultando producto con PartitionKey: {partition_key}, producto_id: {producto_id}")
+
         # Realizar la consulta para obtener el producto por producto_id
         response = table.get_item(
             Key={
