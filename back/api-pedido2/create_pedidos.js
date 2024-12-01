@@ -3,8 +3,6 @@ const dynamoDB = new AWS.DynamoDB.DocumentClient();
 
 exports.handler = async (event) => {
     const { tenant_id, usuario_id, datos } = JSON.parse(event.body);
-    const producto_id = crypto.randomUUID();
-    const estado = "PENDIENTE";
 
     if (!tenant_id || !usuario_id || !datos) {
         return {
@@ -14,6 +12,9 @@ exports.handler = async (event) => {
             })
         };
     }
+
+    const producto_id = crypto.randomUUID();
+    const estado = "PENDIENTE";
 
     const params = {
         TableName: process.env.PEDIDOS_TABLE,

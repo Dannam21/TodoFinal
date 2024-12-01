@@ -3,6 +3,16 @@ const dynamoDB = new AWS.DynamoDB.DocumentClient();
 
 exports.handler = async (event) => {
     const { tenant_id, producto_id, pedido_id } = JSON.parse(event.body);
+
+    if (!tenant_id || !producto_id || !pedido_id) {
+        return {
+            statusCode: 400,
+            body: JSON.stringify({
+                error: 'Missing required data (tenant_id, producto_id, pedido_id)'
+            })
+        };
+    }
+
     const tenantID_productoID = tenant_id + "#" + producto_id;
 
     const params = {
