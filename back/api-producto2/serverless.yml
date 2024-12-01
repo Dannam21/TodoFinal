@@ -22,7 +22,7 @@ functions:
       TABLE_NAME: ${self:provider.environment.PRODUCTO_TABLE}
 
   getProducto:
-    handler: producto/handler_get_producto.lambda_handler
+    handler: get_producto.lambda_handler
     events:
       - http:
           path: producto/get
@@ -31,7 +31,7 @@ functions:
       TABLE_NAME: ${self:provider.environment.PRODUCTO_TABLE}
 
   deleteProducto:
-    handler: producto/handler_delete_producto.lambda_handler
+    handler: delete_producto.lambda_handler
     events:
       - http:
           path: producto/delete

@@ -10,9 +10,9 @@ table = dynamodb.Table(table_name)
 def lambda_handler(event, context):
     try:
         # Obtener los parámetros de consulta
-        producto_id = event['queryStringParameters']['productoID']
-        tenant_id = event['queryStringParameters']['tenantID']
-        categoria_nombre = event['queryStringParameters']['categoriaNombre']
+        producto_id = event['queryStringParameters']['producto_id']
+        tenant_id = event['queryStringParameters']['tenant_id']
+        categoria_nombre = event['queryStringParameters']['categoria_nombre']
 
         # Crear la clave de partición
         partition_key = f"{tenant_id}#{categoria_nombre}"
