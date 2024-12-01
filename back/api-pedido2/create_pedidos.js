@@ -13,15 +13,18 @@ exports.handler = async (event) => {
         };
     }
 
-    const producto_id = crypto.randomUUID();
-    const estado = "PENDIENTE";
-
     const params = {
         TableName: process.env.PEDIDOS_TABLE,
-        Item: { tenant_id, producto_id, usuario_id,
-                estado,
-                datos,
-                createdAt: new Date().toISOString() },
+        Item: { tenantID: tenant_id,
+                usuarioID: usuario_id,
+                pedidoID: crypto.randomUUID(),
+                estado: "PENDIENTE",
+                datos: {
+                    productos: datos.productos,
+                    cantidad: datos.productos.size(),
+                    precio: datos.precio
+                },
+                fechaPedido: new Date().toISOString() },
     };
 
     try {

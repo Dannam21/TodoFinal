@@ -55,7 +55,7 @@ resources:
       Properties:
         TableName: ${self:provider.environment.PEDIDOS_TABLE}
         AttributeDefinitions:
-          - AttributeName: tenant_id#producto_id
+          - AttributeName: tenant_id
             AttributeType: S
           - AttributeName: pedido_id
             AttributeType: S
@@ -64,7 +64,7 @@ resources:
           - AttributeName: tenant_id#usuario_id
             AttributeType: S
         KeySchema:
-          - AttributeName: tenant_id#producto_id
+          - AttributeName: tenant_id
             KeyType: HASH
           - AttributeName: pedido_id
             KeyType: RANGE
@@ -74,7 +74,7 @@ resources:
         LocalSecondaryIndexes:
           - IndexName: EstadoIndex
             KeySchema:
-              - AttributeName: tenant_id#producto_id
+              - AttributeName: tenant_id
                 KeyType: HASH
               - AttributeName: estado
                 KeyType: RANGE

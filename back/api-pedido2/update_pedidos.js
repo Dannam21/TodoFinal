@@ -2,23 +2,21 @@ const AWS = require("aws-sdk");
 const dynamoDB = new AWS.DynamoDB.DocumentClient();
 
 exports.handler = async (event) => {
-    const { tenant_id, producto_id, pedido_id, estado } = JSON.parse(event.body);
+    const { tenant_id, pedido_id, estado } = JSON.parse(event.body);
 
-    if (!tenant_id || !producto_id || !pedido_id || !estado) {
+    if (!tenant_id || !pedido_id || !estado) {
         return {
             statusCode: 400,
             body: JSON.stringify({
-                error: 'Missing required data (tenant_id, producto_id, pedido_id, estado)'
+                error: 'Missing required data (tenant_id, pedido_id, estado)'
             })
         };
     }
 
-    const tenantID_productoID = tenant_id + "#" + producto_id;
-
     const params = {
         TableName: process.env.PEDIDOS_TABLE,
-        Key: { 'tenant_id#producto_id': tenantID_productoID,
-                'pedido_id': pedido_id},
+        Key: { tenant_id: tenantID,
+               pedido_id: pedido_id },
         UpdateExpression: "set estado = :estado",
         ExpressionAttributeValues: { ":estado": estado },
         ReturnValues: "UPDATED_NEW",
