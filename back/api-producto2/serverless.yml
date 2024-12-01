@@ -9,7 +9,7 @@ provider:
   iam:
     role: arn:aws:iam::385301667309:role/LabRole
   environment:
-    PRODUCTO_TABLE: ${sls:stage}-t_productos
+    PRODUCTO_TABLE: ${sls:stage}-proyecto_productos
 
 functions:
   createProducto:
