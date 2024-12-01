@@ -29,6 +29,7 @@ def lambda_handler(event, context):
         
         # Obtener la tabla de DynamoDB usando el nombre de la tabla
         table = dynamodb.Table(table_name)
+        print(table)
 
         # Realizar la consulta usando el índice global (GSI)
         response = table.query(
@@ -37,8 +38,9 @@ def lambda_handler(event, context):
             FilterExpression=boto3.dynamodb.conditions.Key('producto_id').eq(producto_id)  # Filtrar por producto_id
         )
 
-        # Obtener el item de la respuesta
-        item = None
+        print(response)
+        print(item)
+        
         for i in response.get('Items', []):
             if i['producto_id'] == producto_id:
                 item = i
