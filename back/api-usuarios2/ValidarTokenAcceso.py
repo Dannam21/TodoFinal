@@ -26,30 +26,17 @@ def lambda_handler(event, context):
                 'body': json.dumps({'error': 'Token no válido'})
             }
 
-        # Si el rol es "admin", permitir tanto "role" como "tenant_id" y "user_id"
-        if item['role'] == "admin":
-            # Si se proporcionan ambos (role y tenant_id/user_id), validar los dos
-            if role and (tenant_id or user_id):
-                if role != item['role']:
-                    return {
-                        'statusCode': 403,
-                        'body': json.dumps({'error': f'Token no válido para el role: {role}'})
-                    }
-                if tenant_id != item.get("tenant_id") or user_id != item.get("user_id"):
-                    return {
-                        'statusCode': 403,
-                        'body': json.dumps({'error': 'Token no válido para el tenant_id y user_id proporcionados'})
-                    }
-
-            # Si solo se proporciona "role", validamos el role
-            elif role:
+        # Si el rol no es "admin", permitir solo role o tenant_id/user_id, pero no ambos
+        if item['role'] != "admin":
+            # Si se proporciona "role", validamos el role
+            if role:
                 if role != item['role']:
                     return {
                         'statusCode': 403,
                         'body': json.dumps({'error': f'Token no válido para el role: {role}'})
                     }
 
-            # Si solo se proporcionan "tenant_id" y "user_id", validamos estos
+            # Si se proporciona "tenant_id" y "user_id", validamos estos
             elif tenant_id and user_id:
                 if tenant_id != item.get("tenant_id") or user_id != item.get("user_id"):
                     return {
@@ -74,10 +61,8 @@ def lambda_handler(event, context):
         # Token es válido
         return {
             'statusCode': 200,
-            'body': json.dumps({
-                'message': 'Token válido'
-            })
-        }
+            'message': 'Token válido'
+            }
 
     except Exception as e:
         return {
