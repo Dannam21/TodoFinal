@@ -41,7 +41,7 @@ functions:
       TABLE_NAME: ${self:provider.environment.PRODUCTO_TABLE}
 
   listProductos:
-    handler: producto/handler_list_productos.lambda_handler
+    handler: list_productos.lambda_handler
     events:
       - http:
           path: producto/list
@@ -50,7 +50,7 @@ functions:
       TABLE_NAME: ${self:provider.environment.PRODUCTO_TABLE}
 
   updateProducto:
-    handler: producto/handler_update_producto.lambda_handler
+    handler: update_producto.lambda_handler
     events:
       - http:
           path: producto/update
