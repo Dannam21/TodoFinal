@@ -43,8 +43,7 @@ def lambda_handler(event, context):
         # Crear la clave de partición utilizando tenant_id y categoria_nombre
         partition_key = f"{tenant_id}#{categoria_nombre}"
 
-        # Verificar si ya existe un producto con ese nombre en esa categoría
-        # En este caso, la consulta debe buscar con la clave de partición y la clave de ordenación (stock)
+        # Verificar si ya existe un producto con ese nombre en esa categoría y con ese stock
         response = table.query(
             KeyConditionExpression=Key('tenant_id#categoria_nombre').eq(partition_key) & Key('stock').eq(stock)
         )
