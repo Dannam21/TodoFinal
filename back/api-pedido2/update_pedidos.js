@@ -2,12 +2,15 @@ const AWS = require("aws-sdk");
 const dynamoDB = new AWS.DynamoDB.DocumentClient();
 
 exports.handler = async (event) => {
-    const { email, nombre, password } = JSON.parse(event.body);
+    const { tenant_id, producto_id, pedido_id, estado } = JSON.parse(event.body);
+    const tenantID_productoID = tenant_id + "#" + producto_id;
+
     const params = {
-        TableName: "Pedidos",
-        Key: { email },
-        UpdateExpression: "set nombre = :nombre, password = :password",
-        ExpressionAttributeValues: { ":nombre": nombre, ":password": password },
+        TableName: process.env.PEDIDOS_TABLE,
+        Key: { 'tenant_id#producto_id': tenantID_productoID,
+                'pedido_id': pedido_id},
+        UpdateExpression: "set estado = :estado",
+        ExpressionAttributeValues: { ":estado": estado },
         ReturnValues: "UPDATED_NEW",
     };
 
