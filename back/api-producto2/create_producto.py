@@ -14,30 +14,32 @@ dynamodb = boto3.resource('dynamodb')
 table_name = os.environ['TABLE_NAME']
 table = dynamodb.Table(table_name)
 
+
 # Función para convertir Decimal a float
 def decimal_default(obj):
     if isinstance(obj, Decimal):
         return float(obj)  # Convertir Decimal a float
     raise TypeError("Type not serializable")
 
+
 def lambda_handler(event, context):
     try:
-        logger.info("Received event: %s", json.dumps(event))
+        # Log event with Decimal conversion to float
+        logger.info("Received event: %s", json.dumps(event, default=decimal_default))
 
         # Obtener el cuerpo de la solicitud
         body = json.loads(event['body'])
 
-
-        
+        # Obtener el token de autorización
         token = event['headers'].get('Authorization')
-            
+
         if not token:
             return {
                 'statusCode': 400,
                 'body': json.dumps({'error': 'Authorization token is missing'})
             }
 
-            # Crear el cliente de Lambda para invocar la función de validación del token
+        # Crear el cliente de Lambda para invocar la función de validación del token
         lambda_client = boto3.client('lambda')
 
         payload = {
@@ -45,26 +47,22 @@ def lambda_handler(event, context):
             "role": "admin"
         }
 
-
         invoke_response = lambda_client.invoke(
             FunctionName="ValidarTokenAcceso",  # Asegúrate de que el nombre de la función sea correcto
             InvocationType='RequestResponse',
             Payload=json.dumps(payload)
         )
-        
+
         # Leer la respuesta de la validación del token
         response1 = json.loads(invoke_response['Payload'].read().decode())
-        print(response1)
+        logger.info("Token validation response: %s", response1)
+
         if response1['statusCode'] != 200:
             return {
                 'statusCode': 403,
                 'body': json.dumps({'error': 'Forbidden - Acceso No Autorizado'})
             }
-        
-        
 
-
-        
         # Obtener los parámetros
         tenant_id = body.get('tenant_id')
         categoria_nombre = body.get('categoria_nombre')
@@ -123,13 +121,13 @@ def lambda_handler(event, context):
         # Insertar el producto en la base de datos
         table.put_item(Item=producto)
 
-        # Responder con un mensaje de éxito
+        # Responder con un mensaje de éxito, convirtiendo Decimal a float con decimal_default
         return {
             'statusCode': 201,
             'body': json.dumps({
                 'message': 'Producto creado',
                 'producto': producto,
-            }, default=decimal_default)  # Usar la función decimal_default para convertir Decimal
+            }, default=decimal_default)  # Usar decimal_default para convertir Decimal a float
         }
 
     except Exception as e:
