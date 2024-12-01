@@ -6,10 +6,8 @@ const TABLE_NAME = process.env.TABLE_NAME;
 const crearResenia = async (event) => {
     try {
         const body = typeof event.body === "string" ? JSON.parse(event.body) : event.body;
-
         const { tenant_id, producto_id, usuario_id, puntaje, comentario } = body;
 
-        // Validación de datos
         if (!tenant_id || !producto_id || !usuario_id || !puntaje || !comentario) {
             return {
                 statusCode: 400,
@@ -17,23 +15,24 @@ const crearResenia = async (event) => {
             };
         }
 
-        if (puntaje < 1 || puntaje > 5) {
-            return {
-                statusCode: 400,
-                body: JSON.stringify({ message: "El puntaje debe estar entre 1 y 5" })
-            };
-        }
-
+        // Generar el ID de la reseña
         const resenia_id = uuid.v4();
+
+        // Crear el atributo combinado tenant_id_producto_id
+        const tenant_id_producto_id = `${tenant_id}#${producto_id}`;
+
+        // Crear el objeto de la reseña
         const resenia = {
             tenant_id,
-            resenia_id,
             producto_id,
+            resenia_id,
             usuario_id,
             detalle: {
                 puntaje,
                 comentario
-            }
+            },
+            tenant_id_producto_id,  // Esto no es necesario en KeySchema, solo lo guardamos aquí
+            fecha: new Date().toISOString() // Se puede usar para indexar por fecha si es necesario
         };
 
         const params = {
@@ -41,14 +40,15 @@ const crearResenia = async (event) => {
             Item: resenia
         };
 
+        // Guardar la reseña en DynamoDB
         await dynamodb.put(params).promise();
 
         return {
-            statusCode: 201,
+            statusCode: 200,
             body: JSON.stringify({ message: "Reseña creada exitosamente", resenia })
         };
     } catch (error) {
-        console.error("Error al insertar la reseña en DynamoDB:", error);
+        console.error(error);
         return {
             statusCode: 500,
             body: JSON.stringify({ message: "Error al crear la reseña", error: error.message })
@@ -56,5 +56,4 @@ const crearResenia = async (event) => {
     }
 };
 
-// Exportar la función
 module.exports.crearResenia = crearResenia;
