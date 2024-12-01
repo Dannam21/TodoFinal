@@ -37,7 +37,8 @@ def lambda_handler(event, context):
         # Realizar la consulta utilizando la clave de partición 'tenant_id#categoria_nombre' y la clave de ordenación 'producto_id'
         response = table.query(
             KeyConditionExpression=boto3.dynamodb.conditions.Key('tenant_id#categoria_nombre').eq(f"{tenant_id}#{categoria_nombre}") &
-                                   boto3.dynamodb.conditions.Key('producto_id').eq(producto_id)  # Consultamos usando el producto_id
+                                   boto3.dynamodb.conditions.Key('producto_id').eq(producto_id),  # Consultamos usando el producto_id
+            FilterExpression=Key('stock').eq(stock)
         )
         
         # Revisar los resultados de la consulta
