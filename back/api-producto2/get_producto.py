@@ -1,67 +1,56 @@
 import boto3
 import os
-import logging
 import json
+from boto3.dynamodb.conditions import Key
 
 # Configuración de logging
-logging.basicConfig(level=logging.INFO)
+dynamodb = boto3.resource('dynamodb')
+table_name = os.environ['TABLE_NAME']
+table = dynamodb.Table(table_name)
 
 def lambda_handler(event, context):
     try:
-        # Obtén el nombre de la tabla desde las variables de entorno
-        table_name = os.environ.get('TABLE_NAME', 'DefaultTable')
-        logging.info(f"Nombre de la tabla: {table_name}")
-        
-        # Accede a los parámetros queryStringParameters
-        tenant_id = event['queryStringParameters'].get('tenant_id', None)
-        categoria_nombre = event['queryStringParameters'].get('categoria_nombre', None)
+        # Obtener los parámetros de la consulta
+        params = event.get('queryStringParameters', {})
+        tenant_id = params.get('tenant_id')
+        categoria_nombre = params.get('categoria_nombre')
 
-        # Validar parámetros
+        # Verificar si los parámetros requeridos están presentes
         if not tenant_id or not categoria_nombre:
-            logging.error("Faltan parámetros requeridos: tenant_id o categoria_nombre")
             return {
                 'statusCode': 400,
                 'body': json.dumps({'message': 'tenant_id y categoria_nombre son obligatorios'})
             }
 
-        logging.info(f"Parámetros recibidos - tenant_id: {tenant_id}, categoria_nombre: {categoria_nombre}")
-        
-        # Crear el recurso DynamoDB
-        dynamodb = boto3.resource('dynamodb')
-        
-        # Obtener la tabla de DynamoDB usando el nombre de la tabla
-        table = dynamodb.Table(table_name)
-        
+        # Registrar los parámetros recibidos para auditoría
+        print(f"Parámetros recibidos - tenant_id: {tenant_id}, categoria_nombre: {categoria_nombre}")
+
         # Ejecutar la consulta usando el GSI
         response = table.query(
-            IndexName='GSI_TenantID_CategoriaNombre',
-            KeyConditionExpression='tenantID = :tenant_id and categoria_nombre = :categoria_nombre',
-            ExpressionAttributeValues={
-                ':tenant_id': tenant_id,
-                ':categoria_nombre': categoria_nombre
-            }
+            IndexName='GSI_TenantID_CategoriaNombre',  # Nombre del índice GSI
+            KeyConditionExpression=Key('tenantID').eq(tenant_id) & Key('categoria_nombre').eq(categoria_nombre),
+            ProjectionExpression='producto_id, nombre, stock'  # Se puede ajustar según los atributos que necesitas
         )
 
         # Obtener los ítems de la respuesta
         items = response.get('Items', [])
 
         if not items:
-            logging.info(f"No se encontraron productos para tenant_id: {tenant_id} y categoria_nombre: {categoria_nombre}")
+            # Si no hay productos encontrados, retornar un mensaje adecuado
             return {
                 'statusCode': 404,
                 'body': json.dumps({'message': 'No se encontraron productos'})
             }
 
-        logging.info(f"Productos encontrados: {items}")
-
-        # Retornar los productos encontrados
+        # Si se encuentran productos, retornar los datos
         return {
             'statusCode': 200,
-            'body': json.dumps({'productos': items})  # Convertimos a JSON
+            'body': json.dumps({'productos': items})
         }
     
     except Exception as e:
-        logging.error(f"Error inesperado: {str(e)}")
+        # Capturar cualquier excepción y retornar un error 500
+        print(f"Error inesperado: {str(e)}")
         return {
             'statusCode': 500,
             'body': json.dumps({'message': f"Error interno del servidor: {str(e)}"})
