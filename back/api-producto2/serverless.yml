@@ -70,6 +70,8 @@ resources:
             AttributeType: S
           - AttributeName: stock
             AttributeType: N
+          - AttributeName: nombre
+            AttributeType: S  # Agregamos el nombre al esquema de atributos
         KeySchema:
           - AttributeName: producto_id
             KeyType: HASH
@@ -89,6 +91,17 @@ resources:
             KeySchema:
               - AttributeName: tenantID
                 KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 5
+          - IndexName: GSI_productoID_nombre  # GSI para productoID y nombre
+            KeySchema:
+              - AttributeName: producto_id
+                KeyType: HASH
+              - AttributeName: nombre
+                KeyType: RANGE
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
