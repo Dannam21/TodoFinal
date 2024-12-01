@@ -21,25 +21,25 @@ functions:
           cors: true
           integration: lambda
 
-  fetchOrder:
-    handler: fetch_order.handler
+  getOrder:
+    handler: get_order.handler
     events:
       - http:
-          path: /pedidos/fetch
+          path: /pedidos/get
           method: get
           cors: true
           integration: lambda
 
-  createUser:
-    handler: create_user.handler
+  deleteOrder:
+    handler: delete_order.handler
     events:
       - http:
-          path: /usuarios/create
-          method: post
+          path: /usuarios/delete
+          method: delete
           cors: true
           integration: lambda
 
-  fetchUser:
+  fetchOrder:
     handler: fetch_user.handler
     events:
       - http:
