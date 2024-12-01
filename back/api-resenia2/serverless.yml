@@ -28,29 +28,29 @@ resources:
       Properties:
         TableName: ${self:provider.environment.TABLE_NAME}
         AttributeDefinitions:
-          - AttributeName: tenant_producto_id
-            AttributeType: S  # Combinación de tenant_id y producto_id
+          # Definimos todos los atributos usados en el KeySchema
           - AttributeName: tenant_id
-            AttributeType: S  # Atributo adicional para posibles índices
+            AttributeType: S
           - AttributeName: producto_id
-            AttributeType: S  # Atributo adicional para posibles índices
+            AttributeType: S
           - AttributeName: resenia_id
             AttributeType: S
           - AttributeName: fecha
-            AttributeType: S  # Fecha de la reseña
+            AttributeType: S
+          # tenant_producto_id no es un atributo físico, lo concatenamos en la Lambda
         KeySchema:
-          - AttributeName: tenant_producto_id
-            KeyType: HASH  # Clave de partición (tenant_id#producto_id)
+          - AttributeName: tenant_id_producto_id
+            KeyType: HASH  # La clave de partición será la combinación de tenant_id + producto_id
           - AttributeName: resenia_id
-            KeyType: RANGE  # Clave de ordenamiento (resenia_id)
+            KeyType: RANGE  # La clave de ordenamiento será resenia_id
         BillingMode: PAY_PER_REQUEST
         LocalSecondaryIndexes:
           - IndexName: FechaIndex
             KeySchema:
-              - AttributeName: tenant_producto_id
-                KeyType: HASH  # Clave de partición (tenant_id#producto_id)
+              - AttributeName: tenant_id_producto_id
+                KeyType: HASH
               - AttributeName: fecha
-                KeyType: RANGE  # Clave de ordenamiento secundaria para ordenar por fecha
+                KeyType: RANGE
             Projection:
               ProjectionType: ALL
         GlobalSecondaryIndexes:
