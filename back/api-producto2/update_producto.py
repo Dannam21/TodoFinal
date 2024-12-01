@@ -2,13 +2,48 @@ import boto3
 import os
 import json
 
+# Inicializar DynamoDB
 dynamodb = boto3.resource('dynamodb')
 table_name = os.environ['TABLE_NAME']
 table = dynamodb.Table(table_name)
 
+# Inicializar el cliente de Lambda para la validación del token
+lambda_client = boto3.client('lambda')
+
 def lambda_handler(event, context):
     try:
-        # Deserializar el cuerpo si es una cadena JSON
+        # Obtener el token de autorización del encabezado
+        token = event['headers'].get('Authorization')
+        
+        # Verificar si el token está presente
+        if not token:
+            return {
+                'statusCode': 401,
+                'body': json.dumps({'message': 'Token de autorización faltante'})
+            }
+
+        # Validar el token enviándolo a una función Lambda de validación
+        payload = {
+            "token": token,
+            "role": "admin"  # Aquí asumes que el rol debe ser "admin"
+        }
+
+        # Invocar la función Lambda de validación de token
+        invoke_response = lambda_client.invoke(
+            FunctionName="api-usuarios-dev-ValidarTokenAcceso",  # Cambia el nombre de la función Lambda aquí
+            InvocationType='RequestResponse',
+            Payload=json.dumps(payload)
+        )
+
+        # Leer la respuesta de la validación
+        response = json.loads(invoke_response['Payload'].read().decode())
+        if response.get('statusCode') != 200:
+            return {
+                'statusCode': 403,
+                'body': json.dumps({'message': 'Acceso denegado. Token no válido o rol no autorizado'})
+            }
+
+        # Deserializar el cuerpo de la solicitud si es una cadena JSON
         body = json.loads(event['body']) if isinstance(event['body'], str) else event['body']
 
         tenant_id = body.get('tenant_id')
@@ -21,10 +56,10 @@ def lambda_handler(event, context):
                 'body': json.dumps({'message': 'tenant_id, producto_id y updates son requeridos'})
             }
 
+        # Construir la expresión de actualización
         update_expression = "SET "
         expression_values = {}
 
-        # Construir la expresión de actualización
         for key, value in updates.items():
             update_expression += f" {key} = :{key},"
             expression_values[f":{key}"] = value
@@ -42,7 +77,8 @@ def lambda_handler(event, context):
 
         # Devolver la respuesta con los atributos actualizados
         return {
-            'statusCode': 200
+            'statusCode': 200,
+            'body': json.dumps({'message': 'Producto actualizado correctamente', 'updated_attributes': response['Attributes']})
         }
 
     except Exception as e:
