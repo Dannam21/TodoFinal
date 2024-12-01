@@ -41,7 +41,7 @@ def lambda_handler(event, context):
         
         # Realizar la actualización en DynamoDB
         response = table.update_item(
-            Key={'tenantID': tenant_id, 'categoriaID': categoria_id},
+            Key={'tenant_id': tenant_id, 'categoria_id': categoria_id},
             UpdateExpression="SET nombre = :nombre",
             ExpressionAttributeValues={':nombre': nombre},
             ReturnValues="ALL_NEW"
