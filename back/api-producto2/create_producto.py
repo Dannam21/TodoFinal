@@ -24,8 +24,8 @@ def lambda_handler(event, context):
         tenant_id = body.get('tenant_id')
         categoria_nombre = body.get('categoria_nombre')
         nombre = body.get('nombre')
-        stock = int(body.get('stock'))  # Se espera que 'stock' sea un número entero
-        precio = body.get('precio')
+        stock = body.get('stock')  # Se espera que 'stock' sea un número entero
+        precio = body.get('precio')  # Se espera que 'precio' sea un número
 
         # Validación de parámetros obligatorios
         if not tenant_id or not categoria_nombre or not nombre or stock is None or not precio:
@@ -36,7 +36,7 @@ def lambda_handler(event, context):
                 })
             }
 
-        # Asegúrate de convertir el stock a int si es necesario
+        # Asegúrate de convertir el stock a int
         try:
             stock = int(stock)  # Convertir a entero
         except ValueError:
@@ -44,6 +44,17 @@ def lambda_handler(event, context):
                 'statusCode': 400,
                 'body': json.dumps({
                     'error': 'El stock debe ser un número entero válido'
+                })
+            }
+
+        # Asegúrate de convertir el precio a float (o int dependiendo de tu caso)
+        try:
+            precio = float(precio)  # Convertir a número flotante
+        except ValueError:
+            return {
+                'statusCode': 400,
+                'body': json.dumps({
+                    'error': 'El precio debe ser un número válido'
                 })
             }
 
@@ -61,7 +72,7 @@ def lambda_handler(event, context):
             'categoria_nombre': categoria_nombre,
             'nombre': nombre,
             'stock': stock,  # Guardar como int
-            'precio': precio
+            'precio': precio  # Guardar como float o int
         }
 
         # Insertar el producto en la base de datos

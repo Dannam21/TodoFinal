@@ -71,9 +71,11 @@ resources:
           - AttributeName: stock
             AttributeType: N
           - AttributeName: nombre
-            AttributeType: S  # Agregamos el nombre al esquema de atributos
+            AttributeType: S
           - AttributeName: categoria_nombre
-            AttributeType: S  # Asegúrate de que esta propiedad esté incluida
+            AttributeType: S
+          - AttributeName: precio  # Definimos el precio como un atributo adicional
+            AttributeType: N
         KeySchema:
           - AttributeName: producto_id
             KeyType: HASH
@@ -100,11 +102,11 @@ resources:
             ProvisionedThroughput:
               ReadCapacityUnits: 5
               WriteCapacityUnits: 5
-          - IndexName: GSI_productoID_nombre
+          - IndexName: GSI_Precio
             KeySchema:
-              - AttributeName: producto_id
+              - AttributeName: tenant_id  # Clave de partición
                 KeyType: HASH
-              - AttributeName: nombre
+              - AttributeName: precio  # Precio como clave de ordenamiento
                 KeyType: RANGE
             Projection:
               ProjectionType: ALL
@@ -116,4 +118,3 @@ resources:
           WriteCapacityUnits: 5
         PointInTimeRecoverySpecification:
           PointInTimeRecoveryEnabled: true
-
