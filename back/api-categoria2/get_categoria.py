@@ -33,16 +33,15 @@ def lambda_handler(event, context):
             Key={'tenant_id': tenant_id, 'categoria_id': categoria_id}
         )
 
-        # Obtener el item de la respuesta
-        item = response.get('Item', None)
-
-        if not item:
+        # Verificar si la respuesta contiene el item
+        if 'Item' not in response:
             logging.info(f"Categoría no encontrada para tenant_id: {tenant_id} y categoria_id: {categoria_id}")
             return {
                 'statusCode': 404,
                 'body': json.dumps({'message': 'Categoría no encontrada'})
             }
 
+        item = response['Item']
         logging.info(f"Categoría encontrada: {item}")
 
         return {
