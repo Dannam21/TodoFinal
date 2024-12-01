@@ -36,10 +36,11 @@ def lambda_handler(event, context):
         table = dynamodb.Table(table_name)
 
         response = table.query(
-            KeyConditionExpression=boto3.dynamodb.conditions.Key('producto_id').eq(producto_id) &
-                                   boto3.dynamodb.conditions.Key('stock').eq(stock),
-            FilterExpression=boto3.dynamodb.conditions.Key('tenant_id').eq(tenant_id) &
-                             boto3.dynamodb.conditions.Key('categoria_nombre').eq(categoria_nombre)
+            IndexName="GSI_TenantID_CategoriaNombre",  # Specify the GSI to query
+            KeyConditionExpression=boto3.dynamodb.conditions.Key('tenant_id').eq(tenant_id) &
+                                   boto3.dynamodb.conditions.Key('categoria_nombre').eq(categoria_nombre),
+            FilterExpression=boto3.dynamodb.conditions.Key('stock').eq(stock) &
+                             boto3.dynamodb.conditions.Key('producto_id').eq(producto_id)
         )
 
         # Revisar los resultados de la consulta
