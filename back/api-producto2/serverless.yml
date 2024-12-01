@@ -64,25 +64,25 @@ resources:
       Properties:
         TableName: ${self:provider.environment.PRODUCTO_TABLE}
         AttributeDefinitions:
-          - AttributeName: producto_id
-            AttributeType: S
           - AttributeName: tenant_id
+            AttributeType: S
+          - AttributeName: producto_id
             AttributeType: S
           - AttributeName: stock
             AttributeType: N
-          - AttributeName: categoria_nombre
+          - AttributeName: tenant_id#categoria_nombre
             AttributeType: S
           - AttributeName: precio
-            AttributeType: N  # Asegúrate de agregar precio si lo usas en el GSI o KeySchema
+            AttributeType: N
         KeySchema:
-          - AttributeName: producto_id
+          - AttributeName: tenant_id
             KeyType: HASH
-          - AttributeName: stock
+          - AttributeName: producto_id
             KeyType: RANGE
         LocalSecondaryIndexes:
           - IndexName: LSI_Stock
             KeySchema:
-              - AttributeName: producto_id
+              - AttributeName: tenant_id
                 KeyType: HASH
               - AttributeName: stock
                 KeyType: RANGE
@@ -91,19 +91,10 @@ resources:
         GlobalSecondaryIndexes:
           - IndexName: GSI_TenantID_CategoriaNombre
             KeySchema:
-              - AttributeName: tenant_id
+              - AttributeName: tenant_id#categoria_nombre
                 KeyType: HASH
-              - AttributeName: categoria_nombre
-                KeyType: RANGE
-            Projection:
-              ProjectionType: ALL
-            ProvisionedThroughput:
-              ReadCapacityUnits: 5
-              WriteCapacityUnits: 5
-          - IndexName: GSI_precio
-            KeySchema:
               - AttributeName: precio
-                KeyType: HASH
+                KeyType: RANGE
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:

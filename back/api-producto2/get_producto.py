@@ -35,12 +35,10 @@ def lambda_handler(event, context):
         # Obtener la tabla de DynamoDB usando el nombre de la tabla
         table = dynamodb.Table(table_name)
 
+        # Realizar la consulta utilizando la clave de partición 'tenant_id#categoria_nombre' y la clave de ordenación 'producto_id'
         response = table.query(
-            IndexName="GSI_TenantID_CategoriaNombre",  # Specify the GSI to query
             KeyConditionExpression=boto3.dynamodb.conditions.Key('tenant_id').eq(tenant_id) &
-                                   boto3.dynamodb.conditions.Key('categoria_nombre').eq(categoria_nombre),
-            FilterExpression=boto3.dynamodb.conditions.Key('stock').eq(stock) &
-                             boto3.dynamodb.conditions.Key('producto_id').eq(producto_id)
+                                   boto3.dynamodb.conditions.Key('producto_id').eq(producto_id)
         )
 
         # Revisar los resultados de la consulta
