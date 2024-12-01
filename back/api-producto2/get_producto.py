@@ -1,53 +1,70 @@
 import boto3
 import os
+import logging
 import json
 
-# Inicialización de DynamoDB
-dynamodb = boto3.resource('dynamodb')
-table_name = os.environ['TABLE_NAME']
-table = dynamodb.Table(table_name)
+# Configuración de logging
+logging.basicConfig(level=logging.INFO)
 
 def lambda_handler(event, context):
     try:
-        # Obtener los parámetros de consulta
-        producto_id = event['queryStringParameters']['producto_id']
-        tenant_id = event['queryStringParameters']['tenant_id']
-        categoria_nombre = event['queryStringParameters']['categoria_nombre']
+        # Obtén el nombre de la tabla desde las variables de entorno
+        table_name = os.environ.get('TABLE_NAME', 'DefaultTable')
+        logging.info(f"Nombre de la tabla: {table_name}")
+        
+        # Accede a los parámetros queryStringParameters
+        producto_id = event['queryStringParameters'].get('producto_id', None)
+        tenant_id = event['queryStringParameters'].get('tenant_id', None)
+        categoria_nombre = event['queryStringParameters'].get('categoria_nombre', None)
 
-        # Crear la clave de partición combinando tenant_id y categoria_nombre
+        # Validar parámetros
+        if not producto_id or not tenant_id or not categoria_nombre:
+            logging.error("Faltan parámetros requeridos: producto_id, tenant_id o categoria_nombre")
+            return {
+                'statusCode': 400,
+                'body': json.dumps({'message': 'producto_id, tenant_id y categoria_nombre son obligatorios'})
+            }
+
+        logging.info(f"Parámetros recibidos - producto_id: {producto_id}, tenant_id: {tenant_id}, categoria_nombre: {categoria_nombre}")
+        
+        # Crear el recurso DynamoDB
+        dynamodb = boto3.resource('dynamodb')
+        
+        # Obtener la tabla de DynamoDB usando el nombre de la tabla
+        table = dynamodb.Table(table_name)
+        
+        # Crear la clave de partición
         partition_key = f"{tenant_id}#{categoria_nombre}"
 
-        # Realizar la consulta usando la clave de partición y la clave de ordenamiento (producto_id)
+        # Ejecutar la consulta en la tabla
         response = table.get_item(
             Key={
-                'tenant_id#categoria_nombre': partition_key,  # Clave de partición
-                'producto_id': producto_id  # Clave de ordenamiento
+                'tenant_id#categoria_nombre': partition_key,
+                'producto_id': producto_id
             }
         )
 
-        # Obtener el artículo de la respuesta
-        item = response.get('Item')
+        # Obtener el item de la respuesta
+        item = response.get('Item', None)
 
-        # Si no se encuentra el producto
         if not item:
+            logging.info(f"Producto no encontrado para tenant_id: {tenant_id}, categoria_nombre: {categoria_nombre}, producto_id: {producto_id}")
             return {
                 'statusCode': 404,
-                'body': json.dumps({
-                    'error': 'Producto no encontrado'
-                })
+                'body': json.dumps({'message': 'Producto no encontrado'})
             }
 
-        # Si se encuentra el producto
+        logging.info(f"Producto encontrado: {item}")
+
+        # Retornar el producto encontrado
         return {
             'statusCode': 200,
-            'body': json.dumps(item)
+            'body': json.dumps({'producto': item})  # Convertimos a JSON
         }
-
+    
     except Exception as e:
-        # En caso de error
+        logging.error(f"Error inesperado: {str(e)}")
         return {
             'statusCode': 500,
-            'body': json.dumps({
-                'error': f'Error al obtener el producto: {str(e)}'
-            })
+            'body': json.dumps({'message': f"Error interno del servidor: {str(e)}"})
         }
