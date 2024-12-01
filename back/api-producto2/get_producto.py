@@ -17,6 +17,7 @@ def lambda_handler(event, context):
         tenant_id = event['queryStringParameters'].get('tenant_id', None)
         categoria_nombre = event['queryStringParameters'].get('categoria_nombre', None)
         producto_id = event['queryStringParameters'].get('producto_id', None)
+        stock = event['queryStringParameters'].get('stock', None)
         
         # Verificar si todos los parámetros requeridos están presentes
         if not tenant_id or not categoria_nombre or not producto_id:
@@ -38,7 +39,7 @@ def lambda_handler(event, context):
         response = table.query(
             KeyConditionExpression=boto3.dynamodb.conditions.Key('tenant_id#categoria_nombre').eq(f"{tenant_id}#{categoria_nombre}") &
                                    boto3.dynamodb.conditions.Key('producto_id').eq(producto_id),  # Consultamos usando el producto_id
-            FilterExpression=Key('stock').eq(stock)
+            FilterExpression= boto3.dynamodb.conditions.Key('stock').eq(stock)
         )
         
         # Revisar los resultados de la consulta
