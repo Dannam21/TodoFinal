@@ -70,8 +70,10 @@ resources:
             AttributeType: S
           - AttributeName: stock
             AttributeType: N
-          - AttributeName: categoria_nombre
+          - AttributeName: nombre
             AttributeType: S  # Agregamos el nombre al esquema de atributos
+          - AttributeName: categoria_nombre
+            AttributeType: S  # Asegúrate de que esta propiedad esté incluida
         KeySchema:
           - AttributeName: producto_id
             KeyType: HASH
@@ -87,16 +89,18 @@ resources:
             Projection:
               ProjectionType: ALL
         GlobalSecondaryIndexes:
-          - IndexName: GSI_TenantID
+          - IndexName: GSI_TenantID_CategoriaNombre
             KeySchema:
               - AttributeName: tenantID
                 KeyType: HASH
+              - AttributeName: categoria_nombre
+                KeyType: RANGE
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
               ReadCapacityUnits: 5
               WriteCapacityUnits: 5
-          - IndexName: GSI_productoID_nombre  # GSI para productoID y nombre
+          - IndexName: GSI_productoID_nombre
             KeySchema:
               - AttributeName: producto_id
                 KeyType: HASH

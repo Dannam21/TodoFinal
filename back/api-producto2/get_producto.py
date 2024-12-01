@@ -13,17 +13,18 @@ def lambda_handler(event, context):
         logging.info(f"Nombre de la tabla: {table_name}")
         
         # Accede a los parámetros queryStringParameters
-        producto_id = event['queryStringParameters'].get('producto_id', None)
+        tenant_id = event['queryStringParameters'].get('tenant_id', None)
+        categoria_nombre = event['queryStringParameters'].get('categoria_nombre', None)
 
         # Validar parámetros
-        if not producto_id:
-            logging.error("Falta el parámetro requerido: producto_id")
+        if not tenant_id or not categoria_nombre:
+            logging.error("Faltan parámetros requeridos: tenant_id o categoria_nombre")
             return {
                 'statusCode': 400,
-                'body': json.dumps({'message': 'producto_id es obligatorio'})
+                'body': json.dumps({'message': 'tenant_id y categoria_nombre son obligatorios'})
             }
 
-        logging.info(f"Parámetro recibido - producto_id: {producto_id}")
+        logging.info(f"Parámetros recibidos - tenant_id: {tenant_id}, categoria_nombre: {categoria_nombre}")
         
         # Crear el recurso DynamoDB
         dynamodb = boto3.resource('dynamodb')
@@ -31,29 +32,32 @@ def lambda_handler(event, context):
         # Obtener la tabla de DynamoDB usando el nombre de la tabla
         table = dynamodb.Table(table_name)
         
-        # Ejecutar la consulta en la tabla con la clave primaria (producto_id)
-        response = table.get_item(
-            Key={
-                'producto_id': producto_id
+        # Ejecutar la consulta usando el GSI
+        response = table.query(
+            IndexName='GSI_TenantID_CategoriaNombre',
+            KeyConditionExpression='tenantID = :tenant_id and categoria_nombre = :categoria_nombre',
+            ExpressionAttributeValues={
+                ':tenant_id': tenant_id,
+                ':categoria_nombre': categoria_nombre
             }
         )
 
-        # Obtener el item de la respuesta
-        item = response.get('Item', None)
+        # Obtener los ítems de la respuesta
+        items = response.get('Items', [])
 
-        if not item:
-            logging.info(f"Producto no encontrado para producto_id: {producto_id}")
+        if not items:
+            logging.info(f"No se encontraron productos para tenant_id: {tenant_id} y categoria_nombre: {categoria_nombre}")
             return {
                 'statusCode': 404,
-                'body': json.dumps({'message': 'Producto no encontrado'})
+                'body': json.dumps({'message': 'No se encontraron productos'})
             }
 
-        logging.info(f"Producto encontrado: {item}")
+        logging.info(f"Productos encontrados: {items}")
 
-        # Retornar el producto encontrado
+        # Retornar los productos encontrados
         return {
             'statusCode': 200,
-            'body': json.dumps({'producto': item})  # Convertimos a JSON
+            'body': json.dumps({'productos': items})  # Convertimos a JSON
         }
     
     except Exception as e:
