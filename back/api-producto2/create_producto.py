@@ -3,6 +3,7 @@ import uuid
 import os
 import json
 import logging
+from decimal import Decimal
 
 # Configuración de logging
 logger = logging.getLogger()
@@ -47,9 +48,9 @@ def lambda_handler(event, context):
                 })
             }
 
-        # Asegúrate de convertir el precio a float
+        # Asegúrate de convertir el precio a Decimal
         try:
-            precio = float(precio)  # Convertir a número flotante
+            precio = Decimal(precio)  # Convertir a Decimal
         except ValueError:
             return {
                 'statusCode': 400,
@@ -72,7 +73,7 @@ def lambda_handler(event, context):
             'categoria_nombre': categoria_nombre,
             'nombre': nombre,
             'stock': stock,  # Guardar como int
-            'precio': precio  # Guardar como float o int
+            'precio': precio  # Guardar como Decimal
         }
 
         # Insertar el producto en la base de datos
