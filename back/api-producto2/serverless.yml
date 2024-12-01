@@ -21,14 +21,15 @@ functions:
     environment:
       TABLE_NAME: ${self:provider.environment.PRODUCTO_TABLE}
 
-  getProducto:
+  getProductoById:
     handler: get_producto.lambda_handler
     events:
       - http:
-          path: producto/get
+          path: producto/get/{tenant_id}/{producto_id}
           method: get
     environment:
       TABLE_NAME: ${self:provider.environment.PRODUCTO_TABLE}
+
 
   deleteProducto:
     handler: delete_producto.lambda_handler
