@@ -43,9 +43,11 @@ def lambda_handler(event, context):
 
         # Realizar la consulta utilizando la clave de partición 'tenant_id#categoria_nombre' y la clave de ordenación 'producto_id'
         response = table.query(
-            KeyConditionExpression=boto3.dynamodb.conditions.Key('tenant_id#categoria_nombre').eq(f"{tenant_id}#{categoria_nombre}") & 
-                                   boto3.dynamodb.conditions.Key('producto_id').eq(producto_id)
+            KeyConditionExpression=boto3.dynamodb.conditions.Key('tenant_id').eq(tenant_id) & 
+                                boto3.dynamodb.conditions.Key('categoria_nombre').eq(categoria_nombre) & 
+                                boto3.dynamodb.conditions.Key('producto_id').eq(producto_id)
         )
+
         
         # Revisar los resultados de la consulta
         logger.info(f"Respuesta de DynamoDB: {json.dumps(response, indent=2)}")
