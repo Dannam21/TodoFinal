@@ -42,8 +42,7 @@ def lambda_handler(event, context):
 
         # Devolver la respuesta con los atributos actualizados
         return {
-            'statusCode': 200,
-            'body': json.dumps({'updatedProduct': response['Attributes']})
+            'statusCode': 200
         }
 
     except Exception as e:
