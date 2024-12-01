@@ -27,7 +27,9 @@ def lambda_handler(event, context):
 
         # Ejecutar la consulta usando el GSI
         response = table.query(
+            IndexName='GSI_TenantID_CategoriaNombre',
             KeyConditionExpression=Key('tenantID').eq(tenant_id) & Key('categoria_nombre').eq(categoria_nombre),
+            FilterExpression=Key('producto_id').eq(producto_id),  # Filtro por producto_id
             ProjectionExpression='producto_id, nombre, stock'
         )
 
