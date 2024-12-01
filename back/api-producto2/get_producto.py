@@ -3,6 +3,7 @@ import os
 import json
 import logging
 from boto3.dynamodb.conditions import Key
+from decimal import Decimal
 
 # Configuración de logging
 logger = logging.getLogger()
@@ -12,6 +13,12 @@ logger.setLevel(logging.INFO)
 dynamodb = boto3.resource('dynamodb')
 table_name = os.environ['TABLE_NAME']
 table = dynamodb.Table(table_name)
+
+# Función para convertir Decimal a float
+def decimal_default(obj):
+    if isinstance(obj, Decimal):
+        return float(obj)
+    raise TypeError("Type not serializable")
 
 def lambda_handler(event, context):
     try:
@@ -45,10 +52,10 @@ def lambda_handler(event, context):
                 'body': json.dumps({'error': 'Producto no encontrado'})
             }
 
-        # Retornar el producto
+        # Retornar el producto con conversión de Decimal a float
         return {
             'statusCode': 200,
-            'body': json.dumps({'producto': item})
+            'body': json.dumps({'producto': item}, default=decimal_default)  # Aquí se usa decimal_default
         }
 
     except Exception as e:
