@@ -45,6 +45,7 @@ def lambda_handler(event, context):
             "role": "admin"
         }
 
+
         invoke_response = lambda_client.invoke(
             FunctionName="ValidarTokenAcceso",  # Asegúrate de que el nombre de la función sea correcto
             InvocationType='RequestResponse',
@@ -53,11 +54,14 @@ def lambda_handler(event, context):
         
         # Leer la respuesta de la validación del token
         response1 = json.loads(invoke_response['Payload'].read().decode())
+        print(response1)
         if response1['statusCode'] != 200:
             return {
                 'statusCode': 403,
                 'body': json.dumps({'error': 'Forbidden - Acceso No Autorizado'})
             }
+        
+        
 
 
         
