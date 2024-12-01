@@ -74,8 +74,8 @@ resources:
             AttributeType: S
           - AttributeName: categoria_nombre
             AttributeType: S
-          - AttributeName: precio  # Definimos el precio como un atributo adicional
-            AttributeType: N
+          - AttributeName: precio
+            AttributeType: N  # Definimos el tipo de 'precio' como N (Number)
         KeySchema:
           - AttributeName: producto_id
             KeyType: HASH
@@ -102,11 +102,11 @@ resources:
             ProvisionedThroughput:
               ReadCapacityUnits: 5
               WriteCapacityUnits: 5
-          - IndexName: GSI_Precio
+          - IndexName: GSI_TenantID_Precio  # Nuevo GSI con precio como clave de ordenamiento
             KeySchema:
-              - AttributeName: tenant_id  # Clave de partición
+              - AttributeName: tenant_id
                 KeyType: HASH
-              - AttributeName: precio  # Precio como clave de ordenamiento
+              - AttributeName: precio
                 KeyType: RANGE
             Projection:
               ProjectionType: ALL

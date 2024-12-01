@@ -34,10 +34,10 @@ def lambda_handler(event, context):
         # Obtener la tabla de DynamoDB usando el nombre de la tabla
         table = dynamodb.Table(table_name)
 
-        # Realizar la consulta usando el índice global (GSI)
+        # Realizar la consulta usando el índice global (GSI) con 'precio'
         response = table.query(
-            IndexName="GSI_TenantID_CategoriaNombre",  # Asegúrate de que el nombre del índice sea correcto
-            KeyConditionExpression=boto3.dynamodb.conditions.Key('tenant_id').eq(tenant_id) & boto3.dynamodb.conditions.Key('categoria_nombre').eq(categoria_nombre)
+            IndexName="GSI_TenantID_Precio",  # Consultamos usando el GSI con 'precio' como clave de ordenamiento
+            KeyConditionExpression=boto3.dynamodb.conditions.Key('tenant_id').eq(tenant_id) & boto3.dynamodb.conditions.Key('precio').eq(producto_id)  # O la condición que desees
         )
         
         # Revisar los resultados de la consulta
@@ -56,27 +56,6 @@ def lambda_handler(event, context):
                 'statusCode': 404,
                 'body': json.dumps({'message': 'Producto no encontrado'})
             }
-
-        # Si encontramos el producto, procesamos los campos numéricos
-        if 'precio' in item:
-            try:
-                item['precio'] = float(item['precio'])  # Convertir precio a float
-            except ValueError:
-                logger.error(f"Error al convertir el precio: {item['precio']}")
-                return {
-                    'statusCode': 500,
-                    'body': json.dumps({'message': 'Error al convertir el precio del producto'})
-                }
-        
-        if 'stock' in item:
-            try:
-                item['stock'] = int(item['stock'])  # Convertir stock a int
-            except ValueError:
-                logger.error(f"Error al convertir el stock: {item['stock']}")
-                return {
-                    'statusCode': 500,
-                    'body': json.dumps({'message': 'Error al convertir el stock del producto'})
-                }
 
         logger.info(f"Producto encontrado: {item}")
 

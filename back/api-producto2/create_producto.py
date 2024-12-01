@@ -47,7 +47,7 @@ def lambda_handler(event, context):
                 })
             }
 
-        # Asegúrate de convertir el precio a float (o int dependiendo de tu caso)
+        # Asegúrate de convertir el precio a float
         try:
             precio = float(precio)  # Convertir a número flotante
         except ValueError:
