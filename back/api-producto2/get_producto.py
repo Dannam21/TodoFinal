@@ -14,18 +14,16 @@ def lambda_handler(event, context):
         
         # Accede a los parámetros queryStringParameters
         producto_id = event['queryStringParameters'].get('producto_id', None)
-        tenant_id = event['queryStringParameters'].get('tenant_id', None)
-        categoria_nombre = event['queryStringParameters'].get('categoria_nombre', None)
 
         # Validar parámetros
-        if not producto_id or not tenant_id or not categoria_nombre:
-            logging.error("Faltan parámetros requeridos: producto_id, tenant_id o categoria_nombre")
+        if not producto_id:
+            logging.error("Falta el parámetro requerido: producto_id")
             return {
                 'statusCode': 400,
-                'body': json.dumps({'message': 'producto_id, tenant_id y categoria_nombre son obligatorios'})
+                'body': json.dumps({'message': 'producto_id es obligatorio'})
             }
 
-        logging.info(f"Parámetros recibidos - producto_id: {producto_id}, tenant_id: {tenant_id}, categoria_nombre: {categoria_nombre}")
+        logging.info(f"Parámetro recibido - producto_id: {producto_id}")
         
         # Crear el recurso DynamoDB
         dynamodb = boto3.resource('dynamodb')
@@ -33,13 +31,9 @@ def lambda_handler(event, context):
         # Obtener la tabla de DynamoDB usando el nombre de la tabla
         table = dynamodb.Table(table_name)
         
-        # Crear la clave de partición
-        partition_key = f"{tenant_id}#{categoria_nombre}"
-
-        # Ejecutar la consulta en la tabla
+        # Ejecutar la consulta en la tabla con la clave primaria (producto_id)
         response = table.get_item(
             Key={
-                'tenant_id#categoria_nombre': partition_key,
                 'producto_id': producto_id
             }
         )
@@ -48,7 +42,7 @@ def lambda_handler(event, context):
         item = response.get('Item', None)
 
         if not item:
-            logging.info(f"Producto no encontrado para tenant_id: {tenant_id}, categoria_nombre: {categoria_nombre}, producto_id: {producto_id}")
+            logging.info(f"Producto no encontrado para producto_id: {producto_id}")
             return {
                 'statusCode': 404,
                 'body': json.dumps({'message': 'Producto no encontrado'})

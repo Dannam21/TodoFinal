@@ -70,7 +70,7 @@ resources:
             AttributeType: S
           - AttributeName: stock
             AttributeType: N
-          - AttributeName: nombre
+          - AttributeName: categoria_nombre
             AttributeType: S  # Agregamos el nombre al esquema de atributos
         KeySchema:
           - AttributeName: producto_id
