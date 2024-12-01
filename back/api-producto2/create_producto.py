@@ -46,7 +46,7 @@ def lambda_handler(event, context):
         }
 
         invoke_response = lambda_client.invoke(
-            FunctionName="ValidarTokenAcceso",  # Asegúrate de que el nombre de la función sea correcto
+            FunctionName="api-usuarios-dev-ValidarTokenAcceso",  # Asegúrate de que el nombre de la función sea correcto
             InvocationType='RequestResponse',
             Payload=json.dumps(payload)
         )
