@@ -14,14 +14,14 @@ def lambda_handler(event, context):
         tenant_id = event['queryStringParameters']['tenant_id']
         categoria_nombre = event['queryStringParameters']['categoria_nombre']
 
-        # Crear la clave de partición
+        # Crear la clave de partición combinando tenant_id y categoria_nombre
         partition_key = f"{tenant_id}#{categoria_nombre}"
 
         # Realizar la consulta usando la clave de partición y la clave de ordenamiento (producto_id)
         response = table.get_item(
             Key={
-                'tenant_id#categoria_nombre': partition_key,
-                'producto_id': producto_id
+                'tenant_id#categoria_nombre': partition_key,  # Clave de partición correcta
+                'producto_id': producto_id  # Clave de ordenamiento correcta
             }
         )
 
