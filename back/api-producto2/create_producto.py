@@ -2,12 +2,14 @@ import boto3
 import uuid
 import os
 import json
-
+import logging
 from boto3.dynamodb.conditions import Key
 
+# Configuración de logging
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
+# Inicialización de recursos DynamoDB
 dynamodb = boto3.resource('dynamodb')
 table_name = os.environ['PRODUCTS_TABLE']
 table = dynamodb.Table(table_name)
@@ -16,59 +18,72 @@ def lambda_handler(event, context):
     try:
         logger.info("Received event: %s", json.dumps(event))
 
+        # Obtener el cuerpo de la solicitud
         body = json.loads(event['body'])
-        data = body.get('data')
-
+        
+        # Obtener los parámetros
         tenant_id = body.get('tenant_id')
-        producto_id = str(uuid.uuid4())
-        categoria_nombre = body['categoria_nombre']
-        nombre = body['nombre']
-        stock = body['stock']
-        precio = body['precio']
+        categoria_nombre = body.get('categoria_nombre')
+        nombre = body.get('nombre')
+        stock = body.get('stock')
+        precio = body.get('precio')
 
-        if not tenant_id or not producto_id or not categoria_nombre or not nombre or not stock or not precio:
+        # Validación de parámetros obligatorios
+        if not tenant_id or not categoria_nombre or not nombre or not stock or not precio:
             return {
                 'statusCode': 400,
-                'body': json.dumps({'error': 'Missing data values'})
+                'body': json.dumps({
+                    'error': 'Missing required data (tenant_id, categoria_nombre, nombre, stock, precio)'
+                })
             }
 
+        # Crear un nuevo ID de producto único
+        producto_id = str(uuid.uuid4())
+
+        # Crear la clave de partición utilizando tenant_id y categoria_nombre
+        partition_key = f"{tenant_id}#{categoria_nombre}"
+
+        # Realizar una consulta para verificar si ya existe un producto con ese nombre en esa categoría
         response = table.query(
-            IndexName='BusquedaPorNombre',  # El nombre del índice LSI
-            KeyConditionExpression=Key('tenant_id').eq(tenant_id) & Key('nombre').eq(nombre)
+            KeyConditionExpression=Key('tenant_id#categoria_nombre').eq(partition_key) & Key('producto_id').eq(nombre)
         )
 
         if response['Items']:
             return {
                 'statusCode': 400,
-                'body': json.dumps({'error': 'Product already exists for this name'})
+                'body': json.dumps({
+                    'error': 'Product already exists for this name in this category'
+                })
             }
 
+        # Crear el nuevo producto
         producto = {
-            'tenantID': tenant_id,
-            'productoID': producto_id,
-            'categoriaNombre': categoria_nombre,
+            'tenant_id#categoria_nombre': partition_key,  # Clave de partición
+            'producto_id': producto_id,  # Clave de ordenamiento
+            'tenant_id': tenant_id,
+            'categoria_nombre': categoria_nombre,
             'nombre': nombre,
             'stock': stock,
             'precio': precio
         }
 
-        response = table.put_item(Item=producto)
+        # Insertar el producto en la base de datos
+        table.put_item(Item=producto)
 
+        # Responder con un mensaje de éxito
         return {
             'statusCode': 201,
-            'body': {
+            'body': json.dumps({
                 'message': 'Producto creado',
-                'tenantID': tenant_id,
-                'productoID': producto_id,
-                'categoriaNombre': categoria_nombre,
-                'nombre': nombre,
-                'stock': stock,
-                'precio': precio
-            }
+                'producto': producto
+            })
         }
+
     except Exception as e:
-        logger.error("Error creating product: %s", str(e))
+        logger.error("Error creando el producto: %s", str(e))
         return {
             'statusCode': 500,
-            'body': json.dumps({'error': str(e)})
+            'body': json.dumps({
+                'error': f'Error creando el producto: {str(e)}'
+            })
         }

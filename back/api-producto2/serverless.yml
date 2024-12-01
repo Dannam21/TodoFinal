@@ -13,7 +13,7 @@ provider:
 
 functions:
   createProducto:
-    handler: producto/handler_create_producto.lambda_handler
+    handler: create_producto.lambda_handler
     events:
       - http:
           path: producto/create
