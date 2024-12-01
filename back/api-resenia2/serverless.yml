@@ -30,21 +30,25 @@ resources:
         AttributeDefinitions:
           - AttributeName: tenant_producto_id
             AttributeType: S  # Combinación de tenant_id y producto_id
+          - AttributeName: tenant_id
+            AttributeType: S  # Atributo adicional para posibles índices
+          - AttributeName: producto_id
+            AttributeType: S  # Atributo adicional para posibles índices
           - AttributeName: resenia_id
             AttributeType: S
           - AttributeName: fecha
-            AttributeType: S  # Fecha de la reseña (puede ser un string de tipo ISO8601)
+            AttributeType: S  # Fecha de la reseña
         KeySchema:
           - AttributeName: tenant_producto_id
-            KeyType: HASH  # Clave de partición (combinación tenant_id#producto_id)
+            KeyType: HASH  # Clave de partición (tenant_id#producto_id)
           - AttributeName: resenia_id
-            KeyType: RANGE  # Clave de ordenamiento (resenia_id único)
+            KeyType: RANGE  # Clave de ordenamiento (resenia_id)
         BillingMode: PAY_PER_REQUEST
         LocalSecondaryIndexes:
           - IndexName: FechaIndex
             KeySchema:
               - AttributeName: tenant_producto_id
-                KeyType: HASH  # Clave de partición (debe ser la misma que la principal)
+                KeyType: HASH  # Clave de partición (tenant_id#producto_id)
               - AttributeName: fecha
                 KeyType: RANGE  # Clave de ordenamiento secundaria para ordenar por fecha
             Projection:
