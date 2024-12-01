@@ -29,24 +29,20 @@ def lambda_handler(event, context):
         
         # Obtener la tabla de DynamoDB usando el nombre de la tabla
         table = dynamodb.Table(table_name)
-        
-        # Crear la clave de partición usando tenant_id#categoria_nombre
-        partition_key = f"{tenant_id}#{categoria_nombre}"
-        
-        # Loguear las claves que estamos usando
-        logging.info(f"Clave de partición: {partition_key}")
-        logging.info(f"Producto ID: {producto_id}")
 
-        # Ejecutar la consulta en la tabla para obtener el producto por producto_id
-        response = table.get_item(
-            Key={
-                'tenant_id#categoria_nombre': partition_key,
-                'producto_id': producto_id
-            }
+        # Realizar la consulta usando el índice global (GSI)
+        response = table.query(
+            IndexName="GSI_TenantID_CategoriaNombre",  # Asegúrate de que el nombre del índice sea correcto
+            KeyConditionExpression=boto3.dynamodb.conditions.Key('tenantID').eq(tenant_id) & boto3.dynamodb.conditions.Key('categoria_nombre').eq(categoria_nombre),
+            FilterExpression=boto3.dynamodb.conditions.Key('producto_id').eq(producto_id)  # Filtrar por producto_id
         )
 
         # Obtener el item de la respuesta
-        item = response.get('Item', None)
+        item = None
+        for i in response.get('Items', []):
+            if i['producto_id'] == producto_id:
+                item = i
+                break
 
         if not item:
             logging.info(f"Producto no encontrado para tenant_id: {tenant_id}, categoria_nombre: {categoria_nombre} y producto_id: {producto_id}")
