@@ -41,12 +41,14 @@ def lambda_handler(event, context):
         producto_id = str(uuid.uuid4())
 
         # Crear la clave de partición utilizando tenant_id y categoria_nombre
+        # Crear la clave de partición utilizando tenant_id y categoria_nombre
         partition_key = f"{tenant_id}#{categoria_nombre}"
 
-        # Verificar si ya existe un producto con ese nombre en esa categoría y con ese stock
+        # Realizar una consulta para verificar si ya existe un producto con ese nombre en esa categoría
         response = table.query(
-            KeyConditionExpression=Key('tenant_id#categoria_nombre').eq(partition_key) & Key('stock').eq(stock)
+            KeyConditionExpression=Key('tenant_id#categoria_nombre').eq(partition_key) & Key('producto_id').eq(nombre)
         )
+
 
         if response['Items']:
             return {
