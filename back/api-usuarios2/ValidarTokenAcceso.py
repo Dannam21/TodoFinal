@@ -1,6 +1,5 @@
 import boto3
 import json
-import os
 from datetime import datetime
 
 # Inicializar el cliente de DynamoDB
@@ -11,10 +10,12 @@ tokens_table = dynamodb.Table(TOKENS_TABLE)
 def lambda_handler(event, context):
     try:
         # Log del evento recibido
-        print("Evento recibido:", event)
+        print("Evento recibido:", json.dumps(event))
 
-        # Obtener los parámetros de la consulta
-        params = event.get('queryStringParameters', {})
+        # Obtener los parámetros según la estructura del evento
+        params = event.get('queryStringParameters') or event
+
+        # Extraer parámetros relevantes
         token = params.get('token')
         role = params.get('role')
         tenant_id = params.get('tenant_id')
@@ -22,6 +23,7 @@ def lambda_handler(event, context):
 
         # Validar que se envió el token
         if not token:
+            print("Falta el token en los parámetros")
             return {
                 'statusCode': 400,
                 'body': json.dumps({'error': 'El parámetro "token" es obligatorio'})
@@ -53,19 +55,21 @@ def lambda_handler(event, context):
 
         # Validar el rol si no es "admin"
         if item['role'] != "admin":
-            print("Rol del token:", item['role'])
+            print(f"Validando como usuario con rol: {item['role']}")
             
             # Si se proporciona "role", validar
             if role:
                 if role != item['role']:
+                    print(f"El rol proporcionado no coincide: {role} vs {item['role']}")
                     return {
                         'statusCode': 403,
-                        'body': json.dumps({'error': f'Token no válido para el role: {role}'})
+                        'body': json.dumps({'error': f'Token no válido para el rol: {role}'})
                     }
 
             # Si se proporciona "tenant_id" y "user_id", validar
             elif tenant_id and user_id:
                 if tenant_id != item.get("tenant_id") or user_id != item.get("user_id"):
+                    print("Tenant ID o User ID no coinciden")
                     return {
                         'statusCode': 403,
                         'body': json.dumps({'error': 'Token no válido para el tenant_id y user_id proporcionados'})
@@ -79,7 +83,7 @@ def lambda_handler(event, context):
                 }
 
         # Token válido
-        print("Token válido para:", item['role'])
+        print("Token válido:", item)
         return {
             'statusCode': 200,
             'body': json.dumps({'message': 'Token válido'})
