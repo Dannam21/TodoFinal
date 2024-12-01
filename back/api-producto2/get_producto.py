@@ -27,15 +27,14 @@ def lambda_handler(event, context):
 
         # Ejecutar la consulta usando el GSI
         response = table.query(
-            IndexName='GSI_TenantID_CategoriaNombre',  # Nombre del índice GSI
             KeyConditionExpression=Key('tenantID').eq(tenant_id) & Key('categoria_nombre').eq(categoria_nombre),
             ProjectionExpression='producto_id, nombre, stock'  # Se puede ajustar según los atributos que necesitas
         )
 
         # Obtener los ítems de la respuesta
         items = response.get('Items', [])
-        print(items)
-        
+        print(f"Items encontrados: {items}")  # Imprime los ítems encontrados para verificar
+
         if not items:
             # Si no hay productos encontrados, retornar un mensaje adecuado
             return {
