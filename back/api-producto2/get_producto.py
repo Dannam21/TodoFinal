@@ -29,18 +29,19 @@ def lambda_handler(event, context):
         
         # Obtener la tabla de DynamoDB usando el nombre de la tabla
         table = dynamodb.Table(table_name)
-        print(table)
 
         # Realizar la consulta usando el índice global (GSI)
         response = table.query(
             IndexName="GSI_TenantID_CategoriaNombre",  # Asegúrate de que el nombre del índice sea correcto
-            KeyConditionExpression=boto3.dynamodb.conditions.Key('tenantID').eq(tenant_id) & boto3.dynamodb.conditions.Key('categoria_nombre').eq(categoria_nombre),
-            FilterExpression=boto3.dynamodb.conditions.Key('producto_id').eq(producto_id)  # Filtrar por producto_id
+            KeyConditionExpression=boto3.dynamodb.conditions.Key('tenant_id').eq(tenant_id) & boto3.dynamodb.conditions.Key('categoria_nombre').eq(categoria_nombre)
         )
-
-        print(response)
-        print(item)
         
+        # Revisar los resultados de la consulta
+        logging.info(f"Respuesta de DynamoDB: {json.dumps(response, indent=2)}")
+
+        # Buscar el producto específico dentro de los resultados
+        print(item)
+        item = None
         for i in response.get('Items', []):
             if i['producto_id'] == producto_id:
                 item = i
