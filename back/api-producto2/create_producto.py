@@ -24,7 +24,7 @@ def lambda_handler(event, context):
         tenant_id = body.get('tenant_id')
         categoria_nombre = body.get('categoria_nombre')
         nombre = body.get('nombre')
-        stock = body.get('stock')  # Se espera que 'stock' sea un número entero
+        stock = int(body.get('stock'))  # Se espera que 'stock' sea un número entero
         precio = body.get('precio')
 
         # Validación de parámetros obligatorios
