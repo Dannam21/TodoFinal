@@ -64,21 +64,21 @@ resources:
       Properties:
         TableName: ${self:provider.environment.PRODUCTO_TABLE}
         AttributeDefinitions:
-          - AttributeName: productoID
+          - AttributeName: producto_id
             AttributeType: S
           - AttributeName: tenantID
             AttributeType: S
           - AttributeName: stock
             AttributeType: N
         KeySchema:
-          - AttributeName: productoID
+          - AttributeName: producto_id
             KeyType: HASH
           - AttributeName: stock
             KeyType: RANGE
         LocalSecondaryIndexes:
           - IndexName: LSI_Stock
             KeySchema:
-              - AttributeName: productoID
+              - AttributeName: producto_id
                 KeyType: HASH
               - AttributeName: stock
                 KeyType: RANGE
