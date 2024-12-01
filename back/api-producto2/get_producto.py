@@ -1,28 +1,53 @@
 import boto3
 import os
+import json
 
+# Inicialización de DynamoDB
 dynamodb = boto3.resource('dynamodb')
 table_name = os.environ['TABLE_NAME']
 table = dynamodb.Table(table_name)
 
-
 def lambda_handler(event, context):
-    producto_id = event['queryStringParameters']['productoID']
-    tenant_id = event['queryStringParameters']['tenantID']
+    try:
+        # Obtener los parámetros de consulta
+        producto_id = event['queryStringParameters']['productoID']
+        tenant_id = event['queryStringParameters']['tenantID']
+        categoria_nombre = event['queryStringParameters']['categoriaNombre']
 
-    response = table.get_item(
-        Key={'tenantID': tenant_id, 'productoID': producto_id}
-    )
+        # Crear la clave de partición
+        partition_key = f"{tenant_id}#{categoria_nombre}"
 
-    item = response.get('Item')
+        # Realizar la consulta usando la clave de partición y la clave de ordenamiento (producto_id)
+        response = table.get_item(
+            Key={
+                'tenant_id#categoria_nombre': partition_key,
+                'producto_id': producto_id
+            }
+        )
 
-    if not item:
+        # Obtener el artículo de la respuesta
+        item = response.get('Item')
+
+        # Si no se encuentra el producto
+        if not item:
+            return {
+                'statusCode': 404,
+                'body': json.dumps({
+                    'error': 'Producto no encontrado'
+                })
+            }
+
+        # Si se encuentra el producto
         return {
-            'statusCode': 404,
-            'body': 'Producto no encontrado'
+            'statusCode': 200,
+            'body': json.dumps(item)
         }
 
-    return {
-        'statusCode': 200,
-        'body': item
-    }
+    except Exception as e:
+        # En caso de error
+        return {
+            'statusCode': 500,
+            'body': json.dumps({
+                'error': f'Error al obtener el producto: {str(e)}'
+            })
+        }
