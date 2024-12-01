@@ -14,7 +14,7 @@ def lambda_handler(event, context):
         params = event.get('queryStringParameters', {})
         tenant_id = params.get('tenant_id')
         categoria_nombre = params.get('categoria_nombre')
-        producto_id = params.get('producto_id')  # Añadir extracción del producto_id
+        producto_id = params.get('producto_id')  # Optional parameter
 
         # Verificar si los parámetros requeridos están presentes
         if not tenant_id or not categoria_nombre:
@@ -23,21 +23,23 @@ def lambda_handler(event, context):
                 'body': json.dumps({'message': 'tenant_id y categoria_nombre son obligatorios'})
             }
 
-        if not producto_id:  # Verificar si el producto_id está presente si lo usas
-            return {
-                'statusCode': 400,
-                'body': json.dumps({'message': 'producto_id es obligatorio'})
-            }
-
         # Registrar los parámetros recibidos para auditoría
         print(f"Parámetros recibidos - tenant_id: {tenant_id}, categoria_nombre: {categoria_nombre}, producto_id: {producto_id}")
 
+        # Preparar la consulta en función de los parámetros recibidos
+        key_condition = Key('tenantID').eq(tenant_id) & Key('categoria_nombre').eq(categoria_nombre)
+        
+        # Si producto_id está presente, agregar un filtro
+        filter_expression = None
+        if producto_id:
+            filter_expression = Key('producto_id').eq(producto_id)
+
         # Ejecutar la consulta usando el GSI
         response = table.query(
-            IndexName='GSI_TenantID_CategoriaNombre',
-            KeyConditionExpression=Key('tenantID').eq(tenant_id) & Key('categoria_nombre').eq(categoria_nombre),
-            FilterExpression=Key('producto_id').eq(producto_id),  # Filtro por producto_id
-            ProjectionExpression='producto_id, nombre, stock'
+            IndexName='GSI_TenantID_CategoriaNombre',  # Nombre del índice GSI
+            KeyConditionExpression=key_condition,
+            FilterExpression=filter_expression,  # Si producto_id está presente, lo usamos
+            ProjectionExpression='producto_id, nombre, stock'  # Ajusta los atributos según lo necesario
         )
 
         # Obtener los ítems de la respuesta
