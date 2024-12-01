@@ -26,6 +26,40 @@ def lambda_handler(event, context):
 
         # Obtener el cuerpo de la solicitud
         body = json.loads(event['body'])
+
+
+        
+        token = event['headers'].get('Authorization')
+            
+        if not token:
+            return {
+                'statusCode': 400,
+                'body': json.dumps({'error': 'Authorization token is missing'})
+            }
+
+            # Crear el cliente de Lambda para invocar la función de validación del token
+        lambda_client = boto3.client('lambda')
+
+        payload = {
+            "token": token,
+            "role": "admin"
+        }
+
+        invoke_response = lambda_client.invoke(
+            FunctionName="ValidarTokenAcceso",  # Asegúrate de que el nombre de la función sea correcto
+            InvocationType='RequestResponse',
+            Payload=payload_string
+        )
+        
+        # Leer la respuesta de la validación del token
+        response1 = json.loads(invoke_response['Payload'].read().decode())
+        if response1['statusCode'] != 200:
+            return {
+                'statusCode': 403,
+                'body': json.dumps({'error': 'Forbidden - Acceso No Autorizado'})
+            }
+
+
         
         # Obtener los parámetros
         tenant_id = body.get('tenant_id')
