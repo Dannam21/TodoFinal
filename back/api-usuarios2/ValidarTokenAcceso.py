@@ -26,9 +26,13 @@ def lambda_handler(event, context):
                 'body': json.dumps({'error': 'Token no válido'})
             }
 
+        print(item)
+
         # Si el rol no es "admin", permitir solo role o tenant_id/user_id, pero no ambos
         if item['role'] != "admin":
             # Si se proporciona "role", validamos el role
+            print("ingreso: ")
+            print(role)
             if role:
                 if role != item['role']:
                     return {

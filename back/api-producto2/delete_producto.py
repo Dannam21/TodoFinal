@@ -1,6 +1,8 @@
 import boto3
 import os
 import json
+from decimal import Decimal
+
 
 # Inicializar recursos DynamoDB
 dynamodb = boto3.resource('dynamodb')
@@ -41,11 +43,7 @@ def lambda_handler(event, context):
 
         # Respuesta de éxito
         return {
-            'statusCode': 200,
-            'body': json.dumps({
-                'message': 'Producto eliminado',
-                'producto_eliminado': response['Attributes']
-            })
+            'statusCode': 204
         }
 
     except Exception as e:
