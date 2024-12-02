@@ -8,7 +8,7 @@ provider:
   iam:
     role: arn:aws:iam::385301667309:role/LabRole
   environment:
-    TABLE_NAME: Resenas  # Asegúrate que el nombre de la tabla sea correcto
+    RESENIAS_TABLE: Resenas  # Asegúrate que el nombre de la tabla sea correcto
 
 functions:
   crearResena:
@@ -17,39 +17,21 @@ functions:
       - http:
           path: resenas
           method: post
-  obtenerResenas:
-    handler: handler.obtenerResenas
-    events:
-      - http:
-          path: resenas/{tenant_id}/{producto_id}
-          method: get
-  actualizarResena:
-    handler: handler.actualizarResena
-    events:
-      - http:
-          path: resenas
-          method: put
-  eliminarResena:
-    handler: handler.eliminarResena
-    events:
-      - http:
-          path: resenas
-          method: delete
 
 resources:
   Resources:
     ResenasTable:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: Resenas  # Asegúrate de que el nombre de la tabla coincida con la variable de entorno
+        TableName: Resenas  # Nombre de la tabla
         AttributeDefinitions:
-          - AttributeName: tenant_id_producto_id  # Nombre correcto para el atributo de partición
+          - AttributeName: tenant_id_producto_id  # Clave de partición
             AttributeType: S
-          - AttributeName: resenia_id
+          - AttributeName: resenia_id  # Clave de ordenamiento
             AttributeType: S
         KeySchema:
-          - AttributeName: tenant_id_producto_id  # Usar el nombre de partición correcto
+          - AttributeName: tenant_id_producto_id  # Clave de partición
             KeyType: HASH
-          - AttributeName: resenia_id
+          - AttributeName: resenia_id  # Clave de ordenamiento
             KeyType: RANGE
-        BillingMode: PAY_PER_REQUEST
+        BillingMode: PAY_PER_REQUEST  # Modo de facturación sin necesidad de provisión de capacidad

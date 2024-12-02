@@ -1,6 +1,5 @@
 const AWS = require("aws-sdk");
-const { v4: uuidv4 } = require("uuid"); // Para generar resenia_id
-
+const { v4: uuidv4 } = require("uuid");  // Para generar resenia_id
 const dynamoDB = new AWS.DynamoDB.DocumentClient();
 
 exports.handler = async (event) => {
@@ -25,17 +24,17 @@ exports.handler = async (event) => {
     }
 
     // Generar los valores autogenerados
-    const resenia_id = uuidv4(); // Identificador único para la reseña
-    const fecha = new Date().toISOString(); // Fecha actual en formato ISO
+    const resenia_id = uuidv4();  // Identificador único para la reseña
+    const fecha = new Date().toISOString();  // Fecha actual en formato ISO
 
     // Parámetros para guardar en DynamoDB
     const params = {
-        TableName: process.env.RESENIAS_TABLE, // Usar variable de entorno para el nombre de la tabla
+        TableName: process.env.RESENIAS_TABLE,  // Usar variable de entorno para el nombre de la tabla
         Item: {
-            tenant_id_producto_id: `${tenant_id}#${producto_id}`, // Clave de partición
-            resenia_id, // Clave de ordenamiento
-            fecha, // Fecha de creación
-            datos, // Información de la reseña
+            tenant_id_producto_id: `${tenant_id}#${producto_id}`,  // Clave de partición
+            resenia_id,  // Clave de ordenamiento
+            fecha,  // Fecha de creación
+            datos,  // Información de la reseña
         },
     };
 
