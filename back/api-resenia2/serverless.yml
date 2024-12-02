@@ -37,6 +37,8 @@ resources:
             AttributeType: S
           - AttributeName: fecha
             AttributeType: S
+          - AttributeName: usuario_id  # Agregar este atributo
+            AttributeType: S
         KeySchema:
           - AttributeName: tenant_id  # Clave de partición HASH
             KeyType: HASH
