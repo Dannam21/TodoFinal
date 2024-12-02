@@ -1,16 +1,32 @@
-org: dannamendez
+org: ${env:ORG}
 service: api-usuarios
-
 provider:
   name: aws
   runtime: python3.12
   memorySize: 1024
   timeout: 30
   iam:
-    role: arn:aws:iam::385301667309:role/LabRole
+    role: ${env:IAM_ROLE_ARN}
   environment:
     USERS_TABLE: ${sls:stage}-usuarios
-
+  httpApi:
+    cors:
+      allowedOrigins:
+        - '*'  # Permite cualquier origen
+      allowedHeaders:
+        - Content-Type
+        - X-Amz-Date
+        - Authorization
+        - X-Api-Key
+        - X-Amz-Security-Token
+      allowedMethods:
+        - OPTIONS
+        - GET
+        - POST
+        - PUT
+        - DELETE
+      allowCredentials: false
+      
 functions:
   createUsuario:
     handler: create_usuarios.lambda_handler
