@@ -1,67 +1,52 @@
-org: dannamendez
-service: api-resenia
+service: microservicio-resenas
 
 provider:
   name: aws
   runtime: nodejs18.x
-  memorySize: 1024
-  timeout: 30
-  iam:
-    role: arn:aws:iam::385301667309:role/LabRole
+  region: us-east-1
   environment:
-    TABLE_NAME: ${sls:stage}-t_resenias
+    TABLE_NAME: Resenas
 
 functions:
-  crear:
-    handler: resenia.crearResenia
+  crearResena:
+    handler: handler.crearResena
     events:
       - http:
-          path: /resenia/crear
+          path: resenas
           method: post
-          cors: true
-          integration: lambda
+  obtenerResenas:
+    handler: handler.obtenerResenas
+    events:
+      - http:
+          path: resenas/{tenant_id}/{producto_id}
+          method: get
+  actualizarResena:
+    handler: handler.actualizarResena
+    events:
+      - http:
+          path: resenas
+          method: put
+  eliminarResena:
+    handler: handler.eliminarResena
+    events:
+      - http:
+          path: resenas
+          method: delete
 
 resources:
   Resources:
-    TablaResenias:
+    ResenasTable:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: ${self:provider.environment.TABLE_NAME}
+        TableName: Resenas
         AttributeDefinitions:
-          # Definimos los atributos usados en el KeySchema
-          - AttributeName: tenant_id
-            AttributeType: S
-          - AttributeName: producto_id
+          - AttributeName: tenant_id#producto_id
             AttributeType: S
           - AttributeName: resenia_id
             AttributeType: S
-          - AttributeName: fecha
-            AttributeType: S
-          - AttributeName: usuario_id  # Agregar este atributo
-            AttributeType: S
         KeySchema:
-          - AttributeName: tenant_id  # Clave de partición HASH
+          - AttributeName: tenant_id#producto_id
             KeyType: HASH
-          - AttributeName: producto_id  # Clave de ordenación RANGE
+          - AttributeName: resenia_id
             KeyType: RANGE
         BillingMode: PAY_PER_REQUEST
-        LocalSecondaryIndexes:
-          - IndexName: FechaIndex
-            KeySchema:
-              - AttributeName: tenant_id
-                KeyType: HASH
-              - AttributeName: fecha
-                KeyType: RANGE
-            Projection:
-              ProjectionType: ALL
-        GlobalSecondaryIndexes:
-          - IndexName: UsuarioIndex
-            KeySchema:
-              - AttributeName: tenant_id
-                KeyType: HASH
-              - AttributeName: usuario_id
-                KeyType: RANGE
-            Projection:
-              ProjectionType: ALL
-        PointInTimeRecoverySpecification:
-          PointInTimeRecoveryEnabled: true

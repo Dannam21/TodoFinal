@@ -1,56 +1,115 @@
-const AWS = require("aws-sdk");
-const uuid = require("uuid");
-const dynamodb = new AWS.DynamoDB.DocumentClient();
+const AWS = require('aws-sdk');
+const dynamoDb = new AWS.DynamoDB.DocumentClient();
+
 const TABLE_NAME = process.env.TABLE_NAME;
 
-const crearResenia = async (event) => {
-    try {
-        const body = typeof event.body === "string" ? JSON.parse(event.body) : event.body;
-        const { tenant_id, producto_id, usuario_id, puntaje, comentario } = body;
+// Crear reseña
+module.exports.crearResena = async (event) => {
+    const { tenant_id, producto_id, resenia_id, fecha, datos } = JSON.parse(event.body);
 
-        if (!tenant_id || !producto_id || !usuario_id || !puntaje || !comentario) {
-            return {
-                statusCode: 400,
-                body: JSON.stringify({ message: "Datos incompletos" })
-            };
-        }
-
-        const resenia_id = uuid.v4();
-
-        // Crear el atributo combinado tenant_id_producto_id en la Lambda
-        const tenant_id_producto_id = `${tenant_id}#${producto_id}`;
-
-        const resenia = {
-            tenant_id,
-            producto_id,
+    const params = {
+        TableName: TABLE_NAME,
+        Item: {
+            'tenant_id#producto_id': `${tenant_id}#${producto_id}`,
             resenia_id,
-            usuario_id,
-            detalle: {
-                puntaje,
-                comentario
-            },
-            tenant_id_producto_id,  // Solo lo guardamos aquí, no en el KeySchema de DynamoDB
-            fecha: new Date().toISOString()  // Puede ser útil si necesitas indexar por fecha
-        };
+            fecha,
+            datos,
+        },
+    };
 
-        const params = {
-            TableName: TABLE_NAME,
-            Item: resenia
-        };
-
-        await dynamodb.put(params).promise();
-
+    try {
+        await dynamoDb.put(params).promise();
         return {
-            statusCode: 200,
-            body: JSON.stringify({ message: "Reseña creada exitosamente", resenia })
+            statusCode: 201,
+            body: JSON.stringify({ message: 'Reseña creada exitosamente' }),
         };
     } catch (error) {
-        console.error(error);
         return {
             statusCode: 500,
-            body: JSON.stringify({ message: "Error al crear la reseña", error: error.message })
+            body: JSON.stringify({ error: 'Error al crear la reseña', details: error.message }),
         };
     }
 };
 
-module.exports.crearResenia = crearResenia;
+// Obtener reseñas por producto
+module.exports.obtenerResenas = async (event) => {
+    const { tenant_id, producto_id } = event.pathParameters;
+
+    const params = {
+        TableName: TABLE_NAME,
+        KeyConditionExpression: 'tenant_id#producto_id = :key',
+        ExpressionAttributeValues: {
+            ':key': `${tenant_id}#${producto_id}`,
+        },
+    };
+
+    try {
+        const result = await dynamoDb.query(params).promise();
+        return {
+            statusCode: 200,
+            body: JSON.stringify(result.Items),
+        };
+    } catch (error) {
+        return {
+            statusCode: 500,
+            body: JSON.stringify({ error: 'Error al obtener reseñas', details: error.message }),
+        };
+    }
+};
+
+// Actualizar reseña
+module.exports.actualizarResena = async (event) => {
+    const { tenant_id, producto_id, resenia_id, datos } = JSON.parse(event.body);
+
+    const params = {
+        TableName: TABLE_NAME,
+        Key: {
+            'tenant_id#producto_id': `${tenant_id}#${producto_id}`,
+            resenia_id,
+        },
+        UpdateExpression: 'set datos = :datos',
+        ExpressionAttributeValues: {
+            ':datos': datos,
+        },
+        ReturnValues: 'UPDATED_NEW',
+    };
+
+    try {
+        const result = await dynamoDb.update(params).promise();
+        return {
+            statusCode: 200,
+            body: JSON.stringify({ message: 'Reseña actualizada', data: result.Attributes }),
+        };
+    } catch (error) {
+        return {
+            statusCode: 500,
+            body: JSON.stringify({ error: 'Error al actualizar la reseña', details: error.message }),
+        };
+    }
+};
+
+// Eliminar reseña
+module.exports.eliminarResena = async (event) => {
+    const { tenant_id, producto_id, resenia_id } = JSON.parse(event.body);
+
+    const params = {
+        TableName: TABLE_NAME,
+        Key: {
+            'tenant_id#producto_id': `${tenant_id}#${producto_id}`,
+            resenia_id,
+        },
+    };
+
+    try {
+        await dynamoDb.delete(params).promise();
+        return {
+            statusCode: 200,
+            body: JSON.stringify({ message: 'Reseña eliminada exitosamente' }),
+        };
+    } catch (error) {
+        return {
+            statusCode: 500,
+            body: JSON.stringify({ error: 'Error al eliminar la reseña', details: error.message }),
+        };
+    }
+};
