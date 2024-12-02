@@ -40,9 +40,7 @@ resources:
         KeySchema:
           - AttributeName: tenant_id  # Clave de partición HASH
             KeyType: HASH
-          - AttributeName: producto_id  # Parte de la clave combinada
-            KeyType: RANGE
-          - AttributeName: resenia_id  # Clave de ordenación RANGE
+          - AttributeName: producto_id  # Clave de ordenación RANGE
             KeyType: RANGE
         BillingMode: PAY_PER_REQUEST
         LocalSecondaryIndexes:
