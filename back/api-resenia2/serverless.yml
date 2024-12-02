@@ -6,9 +6,9 @@ provider:
   memorySize: 1024
   timeout: 30
   iam:
-    role: arn:aws:iam::385301667309:role/LabRole 
+    role: arn:aws:iam::385301667309:role/LabRole
   environment:
-    TABLE_NAME: Resenas
+    TABLE_NAME: Resenas  # Asegúrate que el nombre de la tabla sea correcto
 
 functions:
   crearResena:
@@ -41,14 +41,14 @@ resources:
     ResenasTable:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: Resenas
+        TableName: Resenas  # Asegúrate de que el nombre de la tabla coincida con la variable de entorno
         AttributeDefinitions:
-          - AttributeName: tenant_id#producto_id
+          - AttributeName: tenant_id_producto_id  # Nombre correcto para el atributo de partición
             AttributeType: S
           - AttributeName: resenia_id
             AttributeType: S
         KeySchema:
-          - AttributeName: tenant_id#producto_id
+          - AttributeName: tenant_id_producto_id  # Usar el nombre de partición correcto
             KeyType: HASH
           - AttributeName: resenia_id
             KeyType: RANGE
