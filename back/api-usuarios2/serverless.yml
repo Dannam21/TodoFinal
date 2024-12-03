@@ -12,7 +12,6 @@ provider:
     TOKENS_TABLE: ${sls:stage}-t_tokens_acceso
     VALIDAR_TOKEN_LAMBDA_NAME: ${self:service}-${sls:stage}-ValidarTokenAcceso
 
-      
 functions:
   createUsuario:
     handler: create_usuarios.lambda_handler
@@ -20,16 +19,14 @@ functions:
       - http:
           path: usuarios/create
           method: post
-          cors: true
-
-  createUsuarioOptions:
-    handler: options_handler.lambda_handler
-    events:
-      - http:
-          path: /usuarios/{proxy+} 
-          method: options
-          cors: true  
-
+          cors:
+            origin: '*'  # Permitir cualquier origen
+            headers:
+              - Content-Type
+              - Authorization
+              - X-Amz-Date
+              - X-Api-Key
+              - X-Amz-Security-Token
 
   deleteUsuario:
     handler: delete_usuarios.lambda_handler
@@ -37,8 +34,14 @@ functions:
       - http:
           path: usuarios/delete
           method: delete
-          cors: true
-
+          cors:
+            origin: '*'  # Permitir cualquier origen
+            headers:
+              - Content-Type
+              - Authorization
+              - X-Amz-Date
+              - X-Api-Key
+              - X-Amz-Security-Token
 
   getUsuario:
     handler: get_usuarios.lambda_handler
@@ -46,7 +49,14 @@ functions:
       - http:
           path: usuarios/get
           method: get
-          cors: true
+          cors:
+            origin: '*'  # Permitir cualquier origen
+            headers:
+              - Content-Type
+              - Authorization
+              - X-Amz-Date
+              - X-Api-Key
+              - X-Amz-Security-Token
 
   loginUsuario:
     handler: login_usuarios.lambda_handler
@@ -54,7 +64,14 @@ functions:
       - http:
           path: usuarios/login
           method: post
-          cors: true
+          cors:
+            origin: '*'  # Permitir cualquier origen
+            headers:
+              - Content-Type
+              - Authorization
+              - X-Amz-Date
+              - X-Api-Key
+              - X-Amz-Security-Token
 
   updateUsuario:
     handler: update_usuarios.lambda_handler
@@ -62,7 +79,14 @@ functions:
       - http:
           path: usuarios/update
           method: put
-          cors: true
+          cors:
+            origin: '*'  # Permitir cualquier origen
+            headers:
+              - Content-Type
+              - Authorization
+              - X-Amz-Date
+              - X-Api-Key
+              - X-Amz-Security-Token
 
   ValidarTokenAcceso:
     handler: ValidarTokenAcceso.lambda_handler
@@ -70,6 +94,14 @@ functions:
       - http:
           path: usuarios/validar-token
           method: get
+          cors:
+            origin: '*'  # Permitir cualquier origen
+            headers:
+              - Content-Type
+              - Authorization
+              - X-Amz-Date
+              - X-Api-Key
+              - X-Amz-Security-Token
 
 resources:
   Resources:
