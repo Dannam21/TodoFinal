@@ -22,6 +22,15 @@ functions:
           method: post
           cors: true
 
+  createUsuarioOptions:
+    handler: options_handler.lambda_handler
+    events:
+      - http:
+          path: /usuarios/{proxy+} 
+          method: options
+          cors: true  
+
+
   deleteUsuario:
     handler: delete_usuarios.lambda_handler
     events:
