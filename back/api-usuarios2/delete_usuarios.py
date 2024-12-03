@@ -73,7 +73,7 @@ def lambda_handler(event, context):
 
                 # Invocar la función de validación del token
                 invoke_response = lambda_client.invoke(
-                    FunctionName="ValidarTokenAcceso",
+                    FunctionName=VALIDAR_TOKEN_LAMBDA_NAME,
                     InvocationType='RequestResponse',
                     Payload=json.dumps(payload)
                 )
