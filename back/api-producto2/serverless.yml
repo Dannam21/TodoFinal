@@ -10,6 +10,7 @@ provider:
     role: ${env:IAM_ROLE_ARN}
   environment:
     PRODUCTO_TABLE: ${sls:stage}-proyecto_productos
+    VALIDAR_TOKEN_LAMBDA_NAME: api-usuarios-${self:provider.stage}-ValidarTokenAcceso
 
   httpApi:
     cors:
