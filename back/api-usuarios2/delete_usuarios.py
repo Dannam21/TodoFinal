@@ -6,6 +6,7 @@ from boto3.dynamodb.conditions import Key
 # Configuración de DynamoDB
 dynamodb = boto3.resource('dynamodb')
 USERS_TABLE = os.environ['USERS_TABLE']
+VALIDAR_TOKEN_LAMBDA_NAME =  os.environ['VALIDAR_TOKEN_LAMBDA_NAME']
 table = dynamodb.Table(USERS_TABLE)
 
 def lambda_handler(event, context):
@@ -32,7 +33,7 @@ def lambda_handler(event, context):
 
             # Invocar la función de validación del token
             invoke_response = lambda_client.invoke(
-                FunctionName="ValidarTokenAcceso",  # Asegúrate de que este sea el nombre correcto
+                FunctionName=VALIDAR_TOKEN_LAMBDA_NAME,  # Asegúrate de que este sea el nombre correcto
                 InvocationType='RequestResponse',
                 Payload=json.dumps(payload)
             )
