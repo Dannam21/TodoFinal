@@ -26,6 +26,10 @@ def lambda_handler(event, context):
         if not tenant_id or not user_id:
             return {
                 'statusCode': 400,
+                'headers':{
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Credentials': True, 
+                },
                 'body': json.dumps({'error': 'tenant_id and user_id are required'})
             }
 
@@ -38,6 +42,10 @@ def lambda_handler(event, context):
         if not token:
             return {
                 'statusCode': 400,
+                'headers':{
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Credentials': True, 
+                },
                 'body': json.dumps({'error': 'Authorization token is missing'})
             }
 
@@ -63,6 +71,10 @@ def lambda_handler(event, context):
         if response1['statusCode'] == 403:
             return {
                 'statusCode': 403,
+                'headers':{
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Credentials': True, 
+                },
                 'body': json.dumps({'error': 'Forbidden - Acceso No Autorizado'})
             }
 
@@ -87,6 +99,10 @@ def lambda_handler(event, context):
             if response['Items']:
                 return {
                     'statusCode': 400,
+                    'headers':{
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Credentials': True, 
+                },
                     'body': json.dumps({'error': 'Email already exists for this tenant'})
                 }
 
@@ -109,6 +125,10 @@ def lambda_handler(event, context):
         # Retornar la respuesta con los atributos actualizados
         return {
             'statusCode': 200,
+            'headers':{
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Credentials': True, 
+                },
             'body': json.dumps(response['Attributes'])
         }
     
@@ -116,5 +136,9 @@ def lambda_handler(event, context):
         # Manejo de errores
         return {
             'statusCode': 500,
+            'headers':{
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Credentials': True, 
+                },
             'body': json.dumps({'error': str(e)})
         }
