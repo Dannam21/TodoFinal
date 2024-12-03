@@ -20,22 +20,7 @@ functions:
       - http:
           path: usuarios/create
           method: post
-          cors:
-            allowedOrigins:
-              - '*'  # Permite cualquier origen
-            allowedHeaders:
-              - Content-Type
-              - X-Amz-Date
-              - Authorization
-              - X-Api-Key
-              - X-Amz-Security-Token
-            allowedMethods:
-              - OPTIONS
-              - GET
-              - POST
-              - PUT
-              - DELETE
-            allowCredentials: false
+          cors: true
 
   deleteUsuario:
     handler: delete_usuarios.lambda_handler
@@ -43,22 +28,7 @@ functions:
       - http:
           path: usuarios/delete
           method: delete
-          cors:
-            allowedOrigins:
-              - '*'  # Permite cualquier origen
-            allowedHeaders:
-              - Content-Type
-              - X-Amz-Date
-              - Authorization
-              - X-Api-Key
-              - X-Amz-Security-Token
-            allowedMethods:
-              - OPTIONS
-              - GET
-              - POST
-              - PUT
-              - DELETE
-            allowCredentials: false
+          cors: true
 
 
   getUsuario:
@@ -67,22 +37,7 @@ functions:
       - http:
           path: usuarios/get
           method: get
-          cors:
-            allowedOrigins:
-              - '*'  # Permite cualquier origen
-            allowedHeaders:
-              - Content-Type
-              - X-Amz-Date
-              - Authorization
-              - X-Api-Key
-              - X-Amz-Security-Token
-            allowedMethods:
-              - OPTIONS
-              - GET
-              - POST
-              - PUT
-              - DELETE
-            allowCredentials: false
+          cors: true
 
   loginUsuario:
     handler: login_usuarios.lambda_handler
@@ -90,22 +45,7 @@ functions:
       - http:
           path: usuarios/login
           method: post
-          cors:
-            allowedOrigins:
-              - '*'  # Permite cualquier origen
-            allowedHeaders:
-              - Content-Type
-              - X-Amz-Date
-              - Authorization
-              - X-Api-Key
-              - X-Amz-Security-Token
-            allowedMethods:
-              - OPTIONS
-              - GET
-              - POST
-              - PUT
-              - DELETE
-            allowCredentials: false
+          cors: true
 
   updateUsuario:
     handler: update_usuarios.lambda_handler
@@ -113,22 +53,7 @@ functions:
       - http:
           path: usuarios/update
           method: put
-          cors:
-            allowedOrigins:
-              - '*'  # Permite cualquier origen
-            allowedHeaders:
-              - Content-Type
-              - X-Amz-Date
-              - Authorization
-              - X-Api-Key
-              - X-Amz-Security-Token
-            allowedMethods:
-              - OPTIONS
-              - GET
-              - POST
-              - PUT
-              - DELETE
-            allowCredentials: false
+          cors: true
 
   ValidarTokenAcceso:
     handler: ValidarTokenAcceso.lambda_handler
