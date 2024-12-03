@@ -26,6 +26,8 @@ def lambda_handler(event, context):
         email = body.get('email')
         password = body.get('password')
 
+        print("pasos")
+
         # Validate required fields
         if not tenant_id or not email or not password:
             return {
@@ -36,7 +38,7 @@ def lambda_handler(event, context):
                 }),
                 'body': json.dumps({'error': 'Missing tenant_id, email, or password'})
             }
-
+        print("pasos1")
         hashed_password = hash_password(password)
 
         # Process
@@ -49,7 +51,7 @@ def lambda_handler(event, context):
             KeyConditionExpression=Key('tenant_id').eq(tenant_id) & Key('email').eq(email)
         )
         items = response.get('Items', [])
-
+        print("pasos2")
         if not items:
             return {
                 'statusCode': 403,
@@ -59,7 +61,7 @@ def lambda_handler(event, context):
                 }),
                 'body': json.dumps({'error': 'Usuario no existe'})
             }
-
+        print("pasos3")
         item = items[0]
         if hashed_password == item['password']:
             # Generate token
