@@ -9,6 +9,7 @@ provider:
     role: ${env:IAM_ROLE_ARN}
   environment:
     USERS_TABLE: ${sls:stage}-usuarios
+    TOKENS_TABLE: ${sls:stage}-t_tokens_acceso
   httpApi:
     cors:
       allowedOrigins:
@@ -105,7 +106,7 @@ resources:
     TokensAccesoDynamoDbTable:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: t_tokens_acceso
+        TableName:  ${self:provider.environment.TOKENS_TABLE}
         AttributeDefinitions:
           - AttributeName: token
             AttributeType: S

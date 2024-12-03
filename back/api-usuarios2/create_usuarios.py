@@ -14,7 +14,8 @@ logger.setLevel(logging.INFO)
 dynamodb = boto3.resource('dynamodb')
 USERS_TABLE = os.environ['USERS_TABLE']
 table = dynamodb.Table(USERS_TABLE)
-TOKENS_TABLE = 't_tokens_acceso'
+
+TOKENS_TABLE = os.environ['TOKENS_TABLE']
 tokens_table = dynamodb.Table(TOKENS_TABLE)
 
 # Hash password function

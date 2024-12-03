@@ -38,7 +38,7 @@ def lambda_handler(event, context):
         # Process
         dynamodb = boto3.resource('dynamodb')
         users_table = dynamodb.Table(os.environ['USERS_TABLE'])
-        tokens_table = dynamodb.Table('t_tokens_acceso')
+        tokens_table = dynamodb.Table(os.environ['TOKENS_TABLE'])
 
         response = users_table.query(
             IndexName='BusquedaPorEmail',  # El nombre del índice LSI
