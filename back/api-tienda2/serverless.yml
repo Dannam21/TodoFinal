@@ -11,21 +11,6 @@ provider:
   environment:
     TIENDA_TABLE: ${self:service}-${sls:stage}-tienda  # Usamos la variable `${self:service}` para obtener el nombre del servicio y `${sls:stage}` para el entorno
 
-  httpApi:
-    cors:
-      allowedOrigins:
-        - '*'  # Permite cualquier origen
-      allowedHeaders:
-        - Content-Type
-        - X-Amz-Date
-        - Authorization
-        - X-Api-Key
-        - X-Amz-Security-Token
-      allowedMethods:
-        - OPTIONS
-        - GET
-        - POST
-      allowCredentials: false
 
 functions:
   createProduct:
@@ -34,7 +19,14 @@ functions:
       - http:
           path: /tienda/create
           method: post
-          cors: true
+          cors:
+            origin: '*'  # Permitir cualquier origen
+            headers:
+              - Content-Type
+              - Authorization
+              - X-Amz-Date
+              - X-Api-Key
+              - X-Amz-Security-Token
           integration: lambda
 
   fetchProduct:
@@ -43,7 +35,14 @@ functions:
       - http:
           path: /tienda/fetch
           method: get
-          cors: true
+          cors:
+            origin: '*'  # Permitir cualquier origen
+            headers:
+              - Content-Type
+              - Authorization
+              - X-Amz-Date
+              - X-Api-Key
+              - X-Amz-Security-Token
           integration: lambda
 
 resources:
