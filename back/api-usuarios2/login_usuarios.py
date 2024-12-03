@@ -32,10 +32,10 @@ def lambda_handler(event, context):
         if not tenant_id or not email or not password:
             return {
                 'statusCode': 400,
-                'headers':json.dumps({
+                'headers':{
                     'Access-Control-Allow-Origin': '*',
-                    'Access-Control-Allow-Credentials': 'true', 
-                }),
+                    'Access-Control-Allow-Credentials': True, 
+                },
                 'body': json.dumps({'error': 'Missing tenant_id, email, or password'})
             }
         print("pasos1")
@@ -55,10 +55,10 @@ def lambda_handler(event, context):
         if not items:
             return {
                 'statusCode': 403,
-                 'headers':json.dumps({
+                 'headers':{
                     'Access-Control-Allow-Origin': '*',
-                    'Access-Control-Allow-Credentials': 'true', 
-                }),
+                    'Access-Control-Allow-Credentials': True, 
+                },
                 'body': json.dumps({'error': 'Usuario no existe'})
             }
         print("pasos3")
@@ -80,7 +80,7 @@ def lambda_handler(event, context):
                 'statusCode': 403,
                 'headers': {
                     'Access-Control-Allow-Origin': '*',
-                    'Access-Control-Allow-Credentials': 'true', 
+                    'Access-Control-Allow-Credentials': True, 
                 },
                 'body': json.dumps({'error': 'Password incorrecto'})
             }
