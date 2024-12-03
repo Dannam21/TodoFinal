@@ -78,29 +78,29 @@ def lambda_handler(event, context):
         else:
             return {
                 'statusCode': 403,
-                'headers': json.dumps({
+                'headers': {
                     'Access-Control-Allow-Origin': '*',
                     'Access-Control-Allow-Credentials': 'true', 
-                }),
+                },
                 'body': json.dumps({'error': 'Password incorrecto'})
             }
 
         # Output (json)
         return {
             'statusCode': 200,
-            'headers': json.dumps({
+            'headers': {
                     'Access-Control-Allow-Origin': '*',
-                    'Access-Control-Allow-Credentials': 'true', 
-                }),
+                    'Access-Control-Allow-Credentials': True, 
+                },
             'body': json.dumps({'token': token})
         }
     except Exception as e:
         logger.error("Error during login: %s", str(e))
         return {
             'statusCode': 500,
-            'headers':  json.dumps({
+            'headers':  {
                     'Access-Control-Allow-Origin': '*',
-                    'Access-Control-Allow-Credentials': 'true', 
-                }),
+                    'Access-Control-Allow-Credentials': True, 
+                },
             'body': json.dumps({'error': 'Internal server error'})
         }
